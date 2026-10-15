@@ -25,7 +25,7 @@
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Kilowá", "url": "https://kilowauy.com/", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Web", "inLanguage": "es-UY", "description": "Compará todos los autos eléctricos e híbridos enchufables a la venta en Uruguay: precio, autonomía real, carga rápida, cuánto ahorrás frente a la nafta, mapa de cargadores de UTE y planificador de viajes. Gratis.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "areaServed": {"@type": "Country", "name": "Uruguay"}}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}a.btn{text-decoration:none;display:inline-block}</style>
 <style>
 /* Layout: app de una columna, barra de pestañas fija abajo (pulgar), fichas en hoja deslizante */
 :root{
@@ -1206,7 +1206,11 @@ function calc(){const c=CARS[+$("#cCar").value];const km=+$("#cKm").value,home=+
 // ciudades: [nombre, lat, lon, km desde Montevideo por ruta (si se conoce)]
 const CITY=[["Montevideo",-34.9058,-56.1913,0],["Artigas",-30.4,-56.4667,600],["Atlántida",-34.772,-55.7586,45],["Bella Unión",-30.2591,-57.6003,630],["Canelones",-34.5228,-56.2778,46],["Carmelo",-34.0,-58.2833,250],["Chuy",-33.6971,-53.4616,340],["Colonia del Sacramento",-34.471,-57.844,177],["Durazno",-33.3806,-56.5236,183],["Florida",-34.0956,-56.2142,97],["Fray Bentos",-33.1325,-58.2956,310],["La Paloma",-34.6627,-54.1636,245],["Maldonado",-34.9,-54.95,135],["Melo",-32.3667,-54.1667,390],["Mercedes",-33.2524,-58.0305,280],["Minas",-34.3759,-55.2377,120],["Nueva Palmira",-33.88,-58.41,270],["Paysandú",-32.3214,-58.0756,375],["Piriápolis",-34.8667,-55.2747,98],["Punta del Diablo",-34.0444,-53.5444,300],["Punta del Este",-34.962,-54.945,130],["Río Branco",-32.5973,-53.3854,420],["Rivera",-30.9053,-55.5508,500],["Rocha",-34.4833,-54.3333,210],["Salto",-31.3833,-57.9667,495],["San José de Mayo",-34.3375,-56.7136,95],["Tacuarembó",-31.7333,-55.9833,390],["Treinta y Tres",-33.2333,-54.3833,285],["Trinidad",-33.5165,-56.8996,190],["Young",-32.7,-57.6333,310]];
 const hav=(a,b,c,d)=>{const r=Math.PI/180,x=Math.sin((c-a)*r/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin((d-b)*r/2)**2;return 12742*Math.asin(Math.sqrt(x))};
-function roadKm(i,j){const A=CITY[i],B=CITY[j];if(i===0)return B[3];if(j===0)return A[3];return Math.round(hav(A[1],A[2],B[1],B[2])*1.22/5)*5}
+// Rutas reales por carretera (OpenStreetMap vía OSRM, 15/10/2026), guardadas en la base de Kilowá: "i-j" → [km, minutos, trazado]
+let RUTAS={};(function(){const K="kilowa.rutas1";try{const c=JSON.parse(localStorage.getItem(K)||"null");if(c)RUTAS=c}catch(e){}fetch("https://vigvzprxnlxvizjglopp.supabase.co/rest/v1/rutas?select=k,v",{headers:{apikey:"sb_publishable_tucMmW6_4JK5zBoVIyDNzA_jTqP7k2Z"}}).then(r=>r.ok?r.json():null).then(L=>{if(!Array.isArray(L)||!L.length)return;const o={};for(const x of L)if(/^\d+-\d+$/.test(x.k)&&Array.isArray(x.v)&&typeof x.v[2]==="string")o[x.k]=x.v;const had=Object.keys(RUTAS).length;RUTAS=o;for(const k in RC)delete RC[k];try{localStorage.setItem(K,JSON.stringify(o))}catch(e){}if(typeof fillDest==="function"){fillDest();trip()}}).catch(()=>{})})();
+function decPl(t){const p=[];let i=0,la=0,lo=0;while(i<t.length){for(const k of[0,1]){let r=0,sh=0,b;do{b=t.charCodeAt(i++)-63;r|=(b&31)<<sh;sh+=5}while(b>=32);const d=r&1?~(r>>1):r>>1;if(k===0)la+=d;else lo+=d}p.push([la/1e4,lo/1e4])}return p}
+const RC={};function routeOf(i,j){if(i===j)return null;const key=i+">"+j;if(RC[key])return RC[key];const r=RUTAS[i<j?i+"-"+j:j+"-"+i];if(!r){const A=CITY[i],B=CITY[j],km=i===0?B[3]:j===0?A[3]:Math.round(hav(A[1],A[2],B[1],B[2])*1.22/5)*5;return{km,min:Math.round(km*.75),p:[[A[1],A[2]],[B[1],B[2]]],cum:[0,km],approx:true}}let p=decPl(r[2]);if(i>j)p=p.reverse();const cum=[0];for(let n=1;n<p.length;n++)cum.push(cum[n-1]+hav(p[n-1][0],p[n-1][1],p[n][0],p[n][1]));const f=r[0]/(cum[cum.length-1]||1);return RC[key]={km:r[0],min:r[1],p,cum:cum.map(x=>x*f)}}
+function roadKm(i,j){const R=routeOf(i,j);if(R)return R.approx?R.km:Math.round(R.km/5)*5;const A=CITY[i],B=CITY[j];if(i===0)return B[3];if(j===0)return A[3];return Math.round(hav(A[1],A[2],B[1],B[2])*1.22/5)*5}
 const cOpt=sel=>CITY.map((c,i)=>`<option value="${i}"${i===sel?" selected":""}>${c[0]}<\/option>`).join("");
 $("#tOrig").innerHTML=cOpt(0);
 function fillDest(){const o=+$("#tOrig").value;const cur=+$("#tDest").value;const L=CITY.map((c,i)=>[c,i]).filter(([c,i])=>i!==o).sort((a,b)=>roadKm(o,a[1])-roadKm(o,b[1]));
@@ -1214,40 +1218,44 @@ function fillDest(){const o=+$("#tOrig").value;const cur=+$("#tDest").value;cons
 $("#tDest").innerHTML="";fillDest();$("#tDest").value=20;
 $("#tOrig").addEventListener("input",()=>{fillDest();trip()});
 ["tCar","tDest","tKw","tRt"].forEach(id=>$("#"+id).addEventListener("input",trip));
-// planificador: va eligiendo cargadores rápidos de UTE reales que estén al alcance y acerquen al destino
-const rk=(a,b,c,d)=>hav(a,b,c,d)*1.22;
-function planLeg(from,to,r0,leg,out){const N=ST.filter(s=>s.dc);const n=N.length;const cost=new Array(n).fill(1e12),prev=new Array(n).fill(-1),hop=new Array(n).fill(0),done=new Array(n).fill(false);
- const dTo=N.map(s=>rk(s.la,s.lo,to[0],to[1]));const direct=rk(from[0],from[1],to[0],to[1]);if(direct<=r0)return r0-direct;
- N.forEach((s,i)=>{const a=rk(from[0],from[1],s.la,s.lo);if(a<=r0){cost[i]=10000+a+(s.dc<60?30:0);hop[i]=a}});
- let bestEnd=-1,bestC=1e12;
- for(let it=0;it<n;it++){let u=-1,uc=1e12;for(let i=0;i<n;i++)if(!done[i]&&cost[i]<uc){uc=cost[i];u=i}if(u<0)break;done[u]=true;
-  if(dTo[u]<=leg){const c=uc+dTo[u];if(c<bestC){bestC=c;bestEnd=u}}
-  for(let v=0;v<n;v++){if(done[v])continue;const d=rk(N[u].la,N[u].lo,N[v].la,N[v].lo);if(d>leg||d<10)continue;const c=uc+10000+d+(N[v].dc<60?30:0);if(c<cost[v]){cost[v]=c;prev[v]=u;hop[v]=d}}}
- if(bestEnd<0)return null;const path=[];for(let u=bestEnd;u>=0;u=prev[u])path.unshift({st:N[u],km:hop[u]});out.push(...path);return leg-dTo[bestEnd]}
-// mapa del viaje: ruta (tramos rectos aproximados) con las paradas numeradas
-function tripMap(oI,dI,plan,outN,rt){const O={la:CITY[oI][1],lo:CITY[oI][2]},D={la:CITY[dI][1],lo:CITY[dI][2]};
- const go=[O,...plan.slice(0,outN).map(p=>p.st),D],back=rt?[D,...plan.slice(outN).map(p=>p.st),O]:[];
- const P=[...go,...back].map(p=>proj(p.la,p.lo));let x0=Math.min(...P.map(p=>p[0])),x1=Math.max(...P.map(p=>p[0])),y0=Math.min(...P.map(p=>p[1])),y1=Math.max(...P.map(p=>p[1]));
+// planificador: sigue la ruta real y elige cargadores rápidos de UTE que estén sobre la ruta (o a pocos km)
+function onRoute(R,maxOff){const ky=111.2,kx=111.2*Math.cos(R.p[0][0]*Math.PI/180);const out=[];
+ for(const st of ST){if(!st.dc)continue;let best=1e9,pos=0;for(let n=1;n<R.p.length;n++){const[a1,o1]=R.p[n-1],[a2,o2]=R.p[n];const ax=o1*kx,ay=a1*ky,bx=o2*kx,by=a2*ky,px=st.lo*kx,py=st.la*ky,dx=bx-ax,dy=by-ay,L=dx*dx+dy*dy;let t=L?((px-ax)*dx+(py-ay)*dy)/L:0;t=Math.max(0,Math.min(1,t));const ex=ax+t*dx-px,ey=ay+t*dy-py,d=Math.sqrt(ex*ex+ey*ey);if(d<best){best=d;pos=R.cum[n-1]+t*(R.cum[n]-R.cum[n-1])}}
+  if(best<=maxOff)out.push({st,pos,off:best*1.3})}
+ return out.sort((a,b)=>a.pos-b.pos)}
+// greedy: en cada tramo, el cargador más lejano al que se llega (prefiere 60 kW si está a menos de 25 km del más lejano)
+function planRoute(R,r0,leg,out){if(r0>=R.km)return r0-R.km;const C=onRoute(R,6);let pos=0,rng=r0,last=null;
+ for(let guard=0;guard<30;guard++){if(pos+rng>=R.km)return rng-(R.km-pos)-(last?last.off:0);
+  const reach=C.filter(c=>c.pos>pos+5&&c.pos+c.off<=pos+rng-(last?last.off:0));if(!reach.length)return null;
+  const far=reach[reach.length-1];const pick=reach.filter(c=>c.pos>=far.pos-25&&c.st.dc>=60).pop()||far;
+  out.push({st:pick.st,km:pick.pos-pos+pick.off+(last?last.off:0)});rng=leg;pos=pick.pos;last=pick}
+ return null}
+// mapa del viaje: la ruta real con las paradas numeradas
+function tripMap(oI,dI,plan,outN,rt){const O={la:CITY[oI][1],lo:CITY[oI][2]},D={la:CITY[dI][1],lo:CITY[dI][2]};const R=routeOf(oI,dI);
+ const go=R?R.p.map(([la,lo])=>({la,lo})):[O,...plan.slice(0,outN).map(p=>p.st),D];
+ const P=[...go,...plan.map(p=>p.st)].map(p=>proj(p.la,p.lo));let x0=Math.min(...P.map(p=>p[0])),x1=Math.max(...P.map(p=>p[0])),y0=Math.min(...P.map(p=>p[1])),y1=Math.max(...P.map(p=>p[1]));
  let w=Math.max(x1-x0,160)+90,h=Math.max(y1-y0,0)+90;if(h<w*.62)h=w*.62;if(w<h*.9)w=h*.9;const cx=(x0+x1)/2,cy=(y0+y1)/2;const vb=[cx-w/2,cy-h/2,w,h];
  const k=w/360,f=n=>n.toFixed(1),line=a=>a.map(p=>proj(p.la,p.lo)).map(([x,y])=>f(x)+","+f(y)).join(" ");
  const dots=ST.filter(s=>s.dc>=30).map(s=>{const[x,y]=proj(s.la,s.lo);return x>vb[0]&&x<vb[0]+w&&y>vb[1]&&y<vb[1]+h?`<circle cx="${f(x)}" cy="${f(y)}" r="${f(2.2*k)}" fill="var(--muted)" opacity=".45"/>`:""}).join("");
  const stop=(st,n)=>{const[x,y]=proj(st.la,st.lo);return`<g><circle cx="${f(x)}" cy="${f(y)}" r="${f(9*k)}" fill="var(--sol)" stroke="var(--bg)" stroke-width="${f(2*k)}"/><text x="${f(x)}" y="${f(y+3.6*k)}" text-anchor="middle" font-size="${f(10*k)}" font-weight="700" fill="var(--accent-ink)" font-family="var(--mono)">${n}<\/text><\/g>`};
- const city=(p,n,anchor)=>{const[x,y]=proj(p.la,p.lo);return`<circle cx="${f(x)}" cy="${f(y)}" r="${f(7*k)}" fill="var(--accent)" stroke="var(--bg)" stroke-width="${f(2.5*k)}"/><text x="${f(x)}" y="${f(y-12*k)}" text-anchor="middle" font-size="${f(12*k)}" font-weight="600" fill="var(--fg)" stroke="var(--bg)" stroke-width="${f(3*k)}" paint-order="stroke">${n}<\/text>`};
- return`<svg class="tmap" viewBox="${vb.map(f).join(" ")}" role="img" aria-label="Mapa del viaje de ${CITY[oI][0]} a ${CITY[dI][0]} con ${plan.length} paradas">
+ const city=(p,n)=>{const[x,y]=proj(p.la,p.lo);return`<circle cx="${f(x)}" cy="${f(y)}" r="${f(7*k)}" fill="var(--accent)" stroke="var(--bg)" stroke-width="${f(2.5*k)}"/><text x="${f(x)}" y="${f(y-12*k)}" text-anchor="middle" font-size="${f(12*k)}" font-weight="600" fill="var(--fg)" stroke="var(--bg)" stroke-width="${f(3*k)}" paint-order="stroke">${n}<\/text>`};
+ return`<svg class="tmap" viewBox="${vb.map(f).join(" ")}" role="img" aria-label="Mapa del viaje de ${CITY[oI][0]} a ${CITY[dI][0]} por ruta, con ${plan.length} paradas">
  ${MAP.deps.map(d=>`<path d="${d.d}" fill="var(--land)" stroke="var(--line)" stroke-width="${f(1.2*k)}"/>`).join("")}${dots}
- ${rt?`<polyline points="${line(back)}" fill="none" stroke="var(--sol)" stroke-width="${f(3*k)}" stroke-dasharray="${f(6*k)} ${f(5*k)}" stroke-linecap="round" stroke-linejoin="round"/>`:""}
- <polyline points="${line(go)}" fill="none" stroke="var(--accent)" stroke-width="${f(4*k)}" stroke-linecap="round" stroke-linejoin="round"/>
+ ${rt?`<polyline points="${line(go)}" fill="none" stroke="var(--sol)" stroke-width="${f(8*k)}" stroke-opacity=".35" stroke-linecap="round" stroke-linejoin="round"/>`:""}
+ <polyline points="${line(go)}" fill="none" stroke="var(--accent)" stroke-width="${f(3.5*k)}" stroke-linecap="round" stroke-linejoin="round"/>
  ${plan.map((p,i)=>stop(p.st,i+1)).join("")}${city(O,CITY[oI][0])}${oI!==dI?city(D,CITY[dI][0]):""}<\/svg>
- <div class="glg" style="margin-top:0"><span><i style="background:var(--accent)"><\/i>Ida<\/span>${rt?`<span><i style="background:var(--sol)"><\/i>Vuelta<\/span>`:""}<span><i style="background:var(--muted);opacity:.6"><\/i>Cargadores rápidos UTE<\/span><span>Trazado aproximado<\/span><\/div>`}
+ <div class="glg" style="margin-top:0"><span><i style="background:var(--accent)"><\/i>${R&&R.approx?"Trazado aproximado":rt?"Ida y vuelta por la misma ruta":"Ruta recomendada"}<\/span><span><i style="background:var(--muted);opacity:.6"><\/i>Cargadores rápidos UTE<\/span><\/div>`}
+function gmapsUrl(oI,dI,plan,outN,rt){const ll=p=>p.la.toFixed(5)+","+p.lo.toFixed(5);const O={la:CITY[oI][1],lo:CITY[oI][2]},D={la:CITY[dI][1],lo:CITY[dI][2]};const ws=plan.slice(0,outN).map(p=>p.st);
+ return"https://www.google.com/maps/dir/?api=1&travelmode=driving&origin="+ll(O)+"&destination="+ll(D)+(ws.length?"&waypoints="+encodeURIComponent(ws.map(ll).join("|")):"")}
 function trip(){const c=CARS[+$("#tCar").value];const oI=+$("#tOrig").value,dI=+$("#tDest").value;const on=CITY[oI][0],dn=CITY[dI][0],d0=roadKm(oI,dI);const rt=+$("#tRt").value;const d=d0*(rt?2:1);const kw=+$("#tKw").value;
  if(c.type!=="E"){const evKm=Math.min(d,c.hw);const fuelKm=d-evKm;const lt=fuelKm*c.lcs*1.1/100;const cost=lt*90.45;
   $("#tOut").innerHTML=`<div class="big" style="color:var(--good)">Llegás sin paradas<\/div>${tripMap(oI,dI,[],0,rt)}
-  <div class="grid2"><div class="kv"><span>Distancia<\/span><b>~${d} km<\/b><\/div><div class="kv"><span>Con batería<\/span><b>~${Math.round(evKm)} km<\/b><\/div><div class="kv"><span>A nafta<\/span><b>~${Math.round(fuelKm)} km<\/b><small>~${Math.round(lt)} litros<\/small><\/div><div class="kv"><span>Nafta del viaje<\/span><b>${fmtP(cost)}<\/b><\/div><\/div>
+  <div class="grid2"><div class="kv"><span>Distancia<\/span><b>~${d} km<\/b>${routeOf(oI,dI)?`<small>~${(m=>Math.floor(m/60)+" h "+String(m%60).padStart(2,"0"))(Math.round(routeOf(oI,dI).min*(rt?2:1)))} manejando<\/small>`:""}<\/div><div class="kv"><span>Con batería<\/span><b>~${Math.round(evKm)} km<\/b><\/div><div class="kv"><span>A nafta<\/span><b>~${Math.round(fuelKm)} km<\/b><small>~${Math.round(lt)} litros<\/small><\/div><div class="kv"><span>Nafta del viaje<\/span><b>${fmtP(cost)}<\/b><\/div><\/div>
   <p>${label(c)} sale con la batería llena, usa ~${c.hw} km eléctricos en ruta y sigue a nafta. Si cargás en destino, la vuelta arranca otra vez en eléctrico.<\/p>
   <p class="note">Consumo a nafta en ruta estimado en ${(c.lcs*1.1).toFixed(1).replace(".",",")} L/100 km con batería descargada. Súper 95 a $90,45.<\/p>`;return}
  const per=c.eff*1.22/100;const first=c.usable*.9/per;const leg=c.usable*.7/per;
  const A=[CITY[oI][1],CITY[oI][2]],B=[CITY[dI][1],CITY[dI][2]];
- const attempt=L=>{const pl=[];let r=planLeg(A,B,first,L,pl);const o=pl.length;if(r!==null&&rt)r=planLeg(B,A,r,L,pl);return{pl,r,o}};
+ const RG=routeOf(oI,dI),RB=routeOf(dI,oI);const attempt=L=>{const pl=[];let r=planRoute(RG,first,L,pl);const o=pl.length;if(r!==null&&rt)r=planRoute(RB,r,L,pl);return{pl,r,o}};
  let at=attempt(leg),hi=false;if(at.r===null&&c.dc){const a2=attempt(c.usable*.85/per);if(a2.r!==null){at=a2;hi=true}}
  const plan=at.pl,outN=at.o;let rem=at.r;
  const mins=dcMin(c,kw);
@@ -1260,10 +1268,10 @@ function trip(){const c=CARS[+$("#tCar").value];const oI=+$("#tOrig").value,dI=+
  const hiN=hi?`<p class="note"><b>Ojo:<\/b> en algún tramo no alcanza con cargar hasta 80%: tenés que cargar hasta ~95% en esa parada. Arriba del 80% la carga es más lenta, así que sumá 15–25 minutos.<\/p>`:"";
  const cap=c.dc&&c.dc<kw?`<p class="note">El auto carga a ${c.dc} kW como máximo, así que un cargador más potente no lo acelera.<\/p>`:"";
  $("#tOut").innerHTML=`<div class="big" style="color:${stops?"var(--warn)":"var(--good)"}">${stops?stops+(stops>1?" paradas":" parada"):"Llegás sin cargar"}<\/div>${tripMap(oI,dI,plan,outN,rt)}
- <div class="grid2"><div class="kv"><span>Distancia<\/span><b>~${d} km<\/b><\/div><div class="kv"><span>Alcance en ruta (100→10%)<\/span><b>${Math.round(first)} km<\/b><\/div><div class="kv"><span>Tiempo cargando<\/span><b>${stops*mins} min<\/b><\/div><div class="kv"><span>Costo en cargadores UTE<\/span><b>${fmtP(cost)}<\/b><\/div><\/div>
+ <div class="grid2"><div class="kv"><span>Distancia<\/span><b>~${d} km<\/b><\/div><div class="kv"><span>Alcance en ruta (100→10%)<\/span><b>${Math.round(first)} km<\/b><\/div><div class="kv"><span>Manejando<\/span><b>${(m=>Math.floor(m/60)+" h "+String(m%60).padStart(2,"0"))(Math.round((RG?RG.min:d0/80*60)*(rt?2:1)))}<\/b><small>+ ${stops*mins} min cargando<\/small><\/div><div class="kv"><span>Costo en cargadores UTE<\/span><b>${fmtP(cost)}<\/b><\/div><\/div>
  <div class="legs">${legs.join("")}<\/div>${hiN}${cap}
- <button class="btn ghost" id="tShare">Compartir el plan<\/button>
- <p class="note">Distancias aproximadas por ruta (entre ciudades del interior se estiman desde la distancia en línea recta). Las paradas son cargadores rápidos reales de UTE elegidos para avanzar lo más posible en cada tramo. Con frío, lluvia o aire acondicionado al máximo, contá con 10–20% menos de alcance. Antes de salir, revisá en UTE Mueve que el cargador de cada parada esté operativo.<\/p>`;
+ <div class="row"><a class="btn" href="${gmapsUrl(oI,dI,plan,outN,rt)}" target="_blank" rel="noopener">Abrir en Google Maps<\/a><button class="btn ghost" id="tShare">Compartir el plan<\/button><\/div>
+ <p class="note">La ruta y las distancias son las de la red vial real (OpenStreetMap). Las paradas son cargadores rápidos reales de UTE que están sobre la ruta o a pocos kilómetros, elegidos para avanzar lo más posible en cada tramo. Con frío, lluvia o aire acondicionado al máximo, contá con 10–20% menos de alcance. Antes de salir, revisá en UTE Mueve que el cargador de cada parada esté operativo.<\/p>`;
  $("#tShare").onclick=()=>shareWA(`${on} → ${dn}${rt?" y vuelta":""} con ${c.mk} ${c.md} (~${d} km): ${stops?`${stops} ${stops>1?"paradas":"parada"} de carga: ${plan.map((p,k)=>`${k+1}) ${p.st.name}, ${p.st.city}`).join("; ")}`:"sin paradas de carga"}. Plan armado con Kilowá.`)}
 
 // mapa
