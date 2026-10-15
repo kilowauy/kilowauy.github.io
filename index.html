@@ -590,7 +590,7 @@ nav.tabs button[data-v="info"]{display:none}
 
 <div class="sheet" id="sheet" hidden><div class="card" role="dialog" aria-modal="true" id="sheetCard"></div></div>
 
-<script>
+<script type="text/plain" id="kapp">
 // [marca, modelo, versión, kWh, precio USD, carrocería, autonomía declarada km, ciclo, notas]
 const RAW=[
 ["Arcfox","T1","Full",42.4,22990,"c",375,"NEDC"],["Arcfox","T1","Extra Full",42.4,25650,"c",375,"NEDC"],["Arcfox","αS5","Air",65,39950,"s"],
@@ -639,6 +639,7 @@ const RAW=[
 ["Xpeng","G6","Air RWD",68.02,43990,"X"],["Xpeng","G6","Performance AWD",80.23,54990,"X"],["Xpeng","G9","Performance AWD",98,71990,"L"],
 ["Zeekr","X","Smart RWD",49,37990,"x"],["Zeekr","X","Premium RWD",69.05,46990,"x"],["Zeekr","X","Flagship AWD",69.05,51990,"x"],["Zeekr","7X","Core RWD",75,57990,"X"],["Zeekr","7X","Privilege AWD",100,69990,"X"],["Zeekr","001","Flagship AWD",100,79990,"s"],
 ];
+if(window.OVR&&OVR.precios)RAW.forEach(r=>{const v=OVR.precios[r[0]+"|"+r[1]+"|"+r[2]];if(typeof v==="number"&&v>1000&&v<500000)r[4]=v});
 // Carga: [DC máx kW (0 = no tiene carga rápida), AC a bordo kW, tiempo declarado, conector, fuente l=UY i=internacional e=estimado]
 const CHG={
 "BYD|Seagull|EV300 GLi":[30,6.6,"30–80% en ≤30 min","CCS2","l"],"BYD|Seagull|EV380 GSi":[40,6.6,"30–80% en ≤30 min","CCS2","l"],
@@ -733,7 +734,7 @@ let WATCH={};
 const watchInfo=c=>{const w=WATCH[keyOf(c)];if(!w)return null;return{...w,diff:c.price-w.p}};
 function toggleWatch(c){const k=keyOf(c);if(WATCH[k])delete WATCH[k];else WATCH[k]={p:c.price,d:new Date().toLocaleDateString("es-UY")};store.set("voltio.watch",WATCH);renderList();renderAlerts()}
 function renderAlerts(){const ch=CARS.map(c=>[c,watchInfo(c)]).filter(([c,w])=>w&&w.diff!==0);const n=Object.keys(WATCH).length;
- $("#alerts").innerHTML=ch.length?`<div class="warnbox" style="border-color:var(--good)"><b>Cambios de precio en autos que seguís:</b> ${ch.map(([c,w])=>`${c.md} ${c.vr!=="—"?c.vr:""} ${w.diff<0?"bajó":"subió"} ${fmtU(Math.abs(w.diff))}`).join(" · ")}</div>`:n?`<p class="note" style="margin:0">Seguís ${n} ${n===1?"auto":"autos"}. Si cambia el precio, te lo mostramos acá cuando entres.</p>`:"";
+ $("#alerts").innerHTML=ch.length?`<div class="warnbox" style="border-color:var(--good)"><b>Cambios de precio en autos que seguís:<\/b> ${ch.map(([c,w])=>`${c.md} ${c.vr!=="—"?c.vr:""} ${w.diff<0?"bajó":"subió"} ${fmtU(Math.abs(w.diff))}`).join(" · ")}<\/div>`:n?`<p class="note" style="margin:0">Seguís ${n} ${n===1?"auto":"autos"}. Si cambia el precio, te lo mostramos acá cuando entres.<\/p>`:"";
  const wc=$("#typeChips .chip[data-k=W]");if(wc)wc.textContent=`★ Siguiendo${n?` (${n})`:""}`}
 const LVL=["Sin datos","Limitada","Media","Amplia"];
 const TOP={"BYD|Yuan Pro":1,"BYD|Seagull":2,"Dongfeng|Nammi":3,"BYD|New e2 X":4,"Chevrolet|Spark EUV":5,"JMC|JMEV 3":6,"Geely|EX5":7,"BYD|Yuan Plus":8,"Omoda|E5":9,"JAC|E-S3 Ytterby":10};
@@ -800,8 +801,8 @@ const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v)
 let bodyF=null,typeF=store.get("voltio.type","");
 const MAXR=Math.max(...CARS.map(c=>c.rng));
 const label=c=>`${c.mk} ${c.md}${c.vr&&c.vr!=="—"?" "+c.vr:""}`;
-const imesiTag=c=>c.type!=="E"?'<span class="tag i9">IMESI 2027: ~11% (hoy 2%)</span>':c.imesi===0?'<span class="tag i0">IMESI 2027: 0%</span>':c.imesi===5?'<span class="tag i5">IMESI 2027: ~5%</span>':'<span class="tag i9">IMESI 2027: ~9%</span>';
-const srcTag=c=>`<span class="src ${c.src}">${SRCL[c.src]}</span>`;
+const imesiTag=c=>c.type!=="E"?'<span class="tag i9">IMESI 2027: ~11% (hoy 2%)<\/span>':c.imesi===0?'<span class="tag i0">IMESI 2027: 0%<\/span>':c.imesi===5?'<span class="tag i5">IMESI 2027: ~5%<\/span>':'<span class="tag i9">IMESI 2027: ~9%<\/span>';
+const srcTag=c=>`<span class="src ${c.src}">${SRCL[c.src]}<\/span>`;
 const dcTxt=c=>c.dc?`${c.dc} kW`:"No tiene";
 
 document.querySelectorAll("nav.tabs button").forEach(b=>b.onclick=()=>show(b.dataset.v));
@@ -810,34 +811,34 @@ function show(v){document.querySelectorAll("nav.tabs button").forEach(b=>b.setAt
 // catálogo
 const bc=$("#bodyChips");[["","Todos"],...Object.entries(BODY)].forEach(([k,t])=>{const b=document.createElement("button");b.className="chip";b.textContent=t;b.setAttribute("aria-pressed",k===""?"true":"false");b.onclick=()=>{bodyF=k||null;bc.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed",x===b));renderList()};bc.appendChild(b)});
 const tc=$("#typeChips");[["","Todos"],["E","100% eléctricos"],["H","Híbridos enchufables"],["W","★ Siguiendo"]].forEach(([k,t])=>{const b=document.createElement("button");b.className="chip";b.dataset.k=k;b.textContent=t;b.setAttribute("aria-pressed",k===typeF?"true":"false");b.onclick=()=>{typeF=k;store.set("voltio.type",k);tc.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed",x===b));renderList()};tc.appendChild(b)});
-{const B={};CARS.forEach(c=>B[c.mk]=(B[c.mk]||0)+1);$("#brand").insertAdjacentHTML("beforeend",Object.keys(B).sort((a,b)=>a.localeCompare(b)).map(m=>`<option value="${m}">${m} (${B[m]})</option>`).join(""))}
+{const B={};CARS.forEach(c=>B[c.mk]=(B[c.mk]||0)+1);$("#brand").insertAdjacentHTML("beforeend",Object.keys(B).sort((a,b)=>a.localeCompare(b)).map(m=>`<option value="${m}">${m} (${B[m]})<\/option>`).join(""))}
 ["q","pmax","sort","brand"].forEach(id=>$("#"+id).addEventListener("input",renderList));
 function renderList(){const q=$("#q").value.trim().toLowerCase();const pm=+$("#pmax").value;$("#pmaxO").textContent=pm>=120000?"sin tope":fmtU(pm);const s=$("#sort").value;
  const br=$("#brand").value;let L=CARS.filter(c=>(!br||c.mk===br)&&(!typeF||(typeF==="W"?!!WATCH[keyOf(c)]:typeF==="E"?c.type==="E":c.type!=="E"))&&(!bodyF||c.body===bodyF)&&(pm>=120000||c.price<=pm)&&(!q||label(c).toLowerCase().includes(q)));
  L.sort(s==="price"?(a,b)=>a.price-b.price:s==="range"?(a,b)=>b.rng-a.rng:s==="dc"?(a,b)=>(a.tmax??999)-(b.tmax??999)||a.price-b.price:s==="maint"?(a,b)=>a.m5-b.m5||a.price-b.price:s==="kmusd"?(a,b)=>b.kmusd-a.kmusd:s==="kwh"?(a,b)=>b.kwh-a.kwh:(a,b)=>(a.top||99)-(b.top||99)||a.price-b.price);
  $("#count").textContent=`${L.length} versiones de ${(n=>n===1?"1 marca":n+" marcas")(new Set(L.map(c=>c.mk)).size)} · ${L.filter(c=>c.type==="E").length} eléctricas y ${L.filter(c=>c.type!=="E").length} híbridas enchufables`;
- $("#list").innerHTML=L.length?L.map(c=>`<button class="car" data-id="${c.id}"><div><div class="mk">${c.mk} · ${BODY[c.body]}</div><div class="nm">${c.md}</div><div class="vr">${c.vr!=="—"?c.vr:"Versión única"}</div></div><div class="pr">${fmtU(c.price)}</div>
- <div class="stats">${c.type==="E"?`<span>Real <b>${c.rng} km</b></span><span>Ruta <b>${c.hw} km</b></span>`:`<span>Eléctrica <b>${c.rng} km</b></span><span>Total <b>${c.total.toLocaleString("es-UY")} km</b></span>`}<span>Batería <b>${c.kwh} kWh</b></span><span>Rápida <b>${c.dc?(c.src==="e"?"~":"")+c.dc+" kW":"no"}</b></span></div><div class="bar"><i style="width:${Math.round(c.rng/MAXR*100)}%"></i></div>
- <div class="tags">${(w=>w?`<span class="tag ${w.diff<0?"i0":w.diff>0?"i9":"top"}">${w.diff<0?`★ Bajó ${fmtU(-w.diff)}`:w.diff>0?`★ Subió ${fmtU(w.diff)}`:"★ Siguiendo"}</span>`:"")(watchInfo(c))}${c.type!=="E"?`<span class="tag hy">${TYPE[c.type]}</span>`:""}${c.top?`<span class="tag top">#${c.top} en ventas 2025</span>`:""}${imesiTag(c)}${c.conn==="GB/T"?'<span class="tag gbt">Conector GB/T: necesita adaptador</span>':""}${c.post.lvl===3?'<span class="tag i0">Red de talleres amplia</span>':c.post.lvl===1?'<span class="tag i5">Pocos talleres</span>':""}${c.note?`<span class="tag">${c.note}</span>`:""}</div></button>`).join(""):(typeF==="W"?'<div class="empty">Todavía no seguís ningún auto. Abrí una ficha y tocá «Seguir precio»: si el precio cambia, lo vas a ver acá.</div>':'<div class="empty">Ningún auto cumple esos filtros. Subí el precio máximo o elegí otra carrocería.</div>');
+ $("#list").innerHTML=L.length?L.map(c=>`<button class="car" data-id="${c.id}"><div><div class="mk">${c.mk} · ${BODY[c.body]}<\/div><div class="nm">${c.md}<\/div><div class="vr">${c.vr!=="—"?c.vr:"Versión única"}<\/div><\/div><div class="pr">${fmtU(c.price)}<\/div>
+ <div class="stats">${c.type==="E"?`<span>Real <b>${c.rng} km<\/b><\/span><span>Ruta <b>${c.hw} km<\/b><\/span>`:`<span>Eléctrica <b>${c.rng} km<\/b><\/span><span>Total <b>${c.total.toLocaleString("es-UY")} km<\/b><\/span>`}<span>Batería <b>${c.kwh} kWh<\/b><\/span><span>Rápida <b>${c.dc?(c.src==="e"?"~":"")+c.dc+" kW":"no"}<\/b><\/span><\/div><div class="bar"><i style="width:${Math.round(c.rng/MAXR*100)}%"><\/i><\/div>
+ <div class="tags">${(w=>w?`<span class="tag ${w.diff<0?"i0":w.diff>0?"i9":"top"}">${w.diff<0?`★ Bajó ${fmtU(-w.diff)}`:w.diff>0?`★ Subió ${fmtU(w.diff)}`:"★ Siguiendo"}<\/span>`:"")(watchInfo(c))}${c.type!=="E"?`<span class="tag hy">${TYPE[c.type]}<\/span>`:""}${c.top?`<span class="tag top">#${c.top} en ventas 2025<\/span>`:""}${imesiTag(c)}${c.conn==="GB/T"?'<span class="tag gbt">Conector GB/T: necesita adaptador<\/span>':""}${c.post.lvl===3?'<span class="tag i0">Red de talleres amplia<\/span>':c.post.lvl===1?'<span class="tag i5">Pocos talleres<\/span>':""}${c.note?`<span class="tag">${c.note}<\/span>`:""}<\/div><\/button>`).join(""):(typeF==="W"?'<div class="empty">Todavía no seguís ningún auto. Abrí una ficha y tocá «Seguir precio»: si el precio cambia, lo vas a ver acá.<\/div>':'<div class="empty">Ningún auto cumple esos filtros. Subí el precio máximo o elegí otra carrocería.<\/div>');
  $("#list").querySelectorAll(".car").forEach(b=>b.onclick=()=>openCar(+b.dataset.id))}
 
 // ficha
 function chargePanel(c){
- if(!c.dc)return `<div class="panel"><h3>Carga ${srcTag(c)}</h3><p>${c.type!=="E"?`No declara carga rápida en DC: se carga en casa o en puntos lentos de UTE. Con un cargador de pared de ${c.ac} kW se llena en unas ${c.acH} h.`:"Este modelo no admite carga rápida en DC. Carga en enchufe doméstico o en puntos lentos (AC)."}</p>${c.decl?`<p>Declarado: ${c.decl}.</p>`:""}</div>`;
+ if(!c.dc)return `<div class="panel"><h3>Carga ${srcTag(c)}<\/h3><p>${c.type!=="E"?`No declara carga rápida en DC: se carga en casa o en puntos lentos de UTE. Con un cargador de pared de ${c.ac} kW se llena en unas ${c.acH} h.`:"Este modelo no admite carga rápida en DC. Carga en enchufe doméstico o en puntos lentos (AC)."}<\/p>${c.decl?`<p>Declarado: ${c.decl}.<\/p>`:""}<\/div>`;
  const lanes=[[30,"Cargador 30 kW"],[60,"UTE 60 kW"],[120,"UTE 120 kW"],[480,"Ultra 480 kW"]].map(([k,t])=>[t,dcMin(c,k)]);const mx=Math.max(...lanes.map(l=>l[1]));
- return `<div class="panel"><h3>Carga ${srcTag(c)}</h3>
- <div class="grid2"><div class="kv"><span>Rápida DC máx.</span><b>${c.src==="e"?"~":""}${c.dc} kW</b></div><div class="kv"><span>AC a bordo</span><b>${c.ac||"—"} kW</b></div><div class="kv"><span>Conector</span><b style="font-size:1rem">${c.conn}</b></div><div class="kv"><span>Casa 0–100%</span><b>${c.acH?c.acH+" h":"—"}</b><small>con cargador de pared</small></div></div>
- ${c.decl?`<p>Declarado por la marca: ${c.decl}.</p>`:""}
- <p>Tiempo estimado del 10% al 80% según el cargador:</p>
- <div class="curve">${lanes.map(([t,m])=>`<div class="lane"><span>${t}</span><div class="track"><i style="width:${Math.round(m/mx*100)}%"></i></div><b>${m} min</b></div>`).join("")}</div>
- <p>En un punto UTE típico de 60 kW recuperás unos <b class="num">${c.kmh} km</b> de autonomía por hora de carga.</p>
- ${c.conn==="GB/T"?'<div class="warnbox">Trae conector GB/T. La red UTE usa CCS2, así que necesitás un adaptador. Preguntá si viene incluido.</div>':""}</div>`}
+ return `<div class="panel"><h3>Carga ${srcTag(c)}<\/h3>
+ <div class="grid2"><div class="kv"><span>Rápida DC máx.<\/span><b>${c.src==="e"?"~":""}${c.dc} kW<\/b><\/div><div class="kv"><span>AC a bordo<\/span><b>${c.ac||"—"} kW<\/b><\/div><div class="kv"><span>Conector<\/span><b style="font-size:1rem">${c.conn}<\/b><\/div><div class="kv"><span>Casa 0–100%<\/span><b>${c.acH?c.acH+" h":"—"}<\/b><small>con cargador de pared<\/small><\/div><\/div>
+ ${c.decl?`<p>Declarado por la marca: ${c.decl}.<\/p>`:""}
+ <p>Tiempo estimado del 10% al 80% según el cargador:<\/p>
+ <div class="curve">${lanes.map(([t,m])=>`<div class="lane"><span>${t}<\/span><div class="track"><i style="width:${Math.round(m/mx*100)}%"><\/i><\/div><b>${m} min<\/b><\/div>`).join("")}<\/div>
+ <p>En un punto UTE típico de 60 kW recuperás unos <b class="num">${c.kmh} km<\/b> de autonomía por hora de carga.<\/p>
+ ${c.conn==="GB/T"?'<div class="warnbox">Trae conector GB/T. La red UTE usa CCS2, así que necesitás un adaptador. Preguntá si viene incluido.<\/div>':""}<\/div>`}
 function ownNums(c){const en=energyMonth(c,1250,.8,2.98,90.45);const e=(en.elec+en.fuel)/UYU;const mt=c.m5/60;const pt=patente(c.price,1,c.patR)/12;const sg=insYear(c.price)/12;return{e,mt,pt,sg,t:e+mt+pt+sg}}
 function ownPanel(c){const {e,mt,pt,sg,t}=ownNums(c);
- const row=(n,v,x)=>`<tr><td>${n}${x?`<br><small style="color:var(--muted)">${x}</small>`:""}</td><td class="n">${fmtU(Math.round(v))}</td></tr>`;
- return `<div class="panel" id="ownD"><h3>Cuánto cuesta tenerlo por mes <span class="src e">EST</span></h3>
- <div class="kv"><span>Total estimado, primer año</span><b>${fmtU(Math.round(t))} / mes</b><small>≈ ${fmtP(t*UYU)} por mes, sin la cuota de compra</small></div>
- <div class="scroll"><table>${row(c.type==="E"?"Energía":"Luz y nafta",e,"1.250 km/mes, 80% cargando en casa (tarifa doble horario)")}${row("Mantenimiento",mt,"services, cubiertas, frenos y batería 12 V, promedio de 5 años")}${row("Patente",pt,`${Math.round(c.patR*100)}% del valor sin IVA`)}${row("Seguro todo riesgo",sg,"estimado, Montevideo; cotizá con 2 o 3 aseguradoras")}</table></div></div>`}
+ const row=(n,v,x)=>`<tr><td>${n}${x?`<br><small style="color:var(--muted)">${x}<\/small>`:""}<\/td><td class="n">${fmtU(Math.round(v))}<\/td><\/tr>`;
+ return `<div class="panel" id="ownD"><h3>Cuánto cuesta tenerlo por mes <span class="src e">EST<\/span><\/h3>
+ <div class="kv"><span>Total estimado, primer año<\/span><b>${fmtU(Math.round(t))} / mes<\/b><small>≈ ${fmtP(t*UYU)} por mes, sin la cuota de compra<\/small><\/div>
+ <div class="scroll"><table>${row(c.type==="E"?"Energía":"Luz y nafta",e,"1.250 km/mes, 80% cargando en casa (tarifa doble horario)")}${row("Mantenimiento",mt,"services, cubiertas, frenos y batería 12 V, promedio de 5 años")}${row("Patente",pt,`${Math.round(c.patR*100)}% del valor sin IVA`)}${row("Seguro todo riesgo",sg,"estimado, Montevideo; cotizá con 2 o 3 aseguradoras")}<\/table><\/div><\/div>`}
 // Ficha estilo tablero: medidor de autonomía, datos clave y costo mensual resumido
 function gauge(c){const hyb=c.type!=="E";const mx=Math.max(400,Math.ceil(Math.max(c.rng,c.hw||0,hyb?0:(c.dec||0))/100)*100);
  const R=100,cx=130,cy=132,pt=v=>{const a=Math.PI*(1-Math.min(v,mx)/mx);return[cx+R*Math.cos(a),cy-R*Math.sin(a)]};
@@ -847,66 +848,66 @@ function gauge(c){const hyb=c.type!=="E";const mx=Math.max(400,Math.ceil(Math.ma
  <path d="M30 ${cy} A${R} ${R} 0 0 1 230 ${cy}" stroke="var(--line)" stroke-width="16" fill="none" stroke-linecap="round"/>
  <path d="${arc(c.rng)}" stroke="var(--accent)" stroke-width="16" fill="none" stroke-linecap="round"/>
  ${!hyb&&c.hw?tick(c.hw,"var(--sol)"):""}${!hyb&&c.dec?tick(c.dec,"var(--muted)",1):""}
- <text x="22" y="148" font-size="10" fill="var(--muted)" font-family="var(--mono)">0</text><text x="238" y="148" font-size="10" fill="var(--muted)" font-family="var(--mono)" text-anchor="end">${mx} km</text></svg>
- <div class="gv"><b class="num">${c.rng}</b><span>${hyb?"km eléctricos reales":"km reales en ciudad"}</span></div></div>
- <div class="glg">${hyb?`<span>Total con nafta ${c.total.toLocaleString("es-UY")} km</span>${c.dec?`<span>Declarada eléctrica ${c.dec} (${c.cyc})</span>`:""}`:`<span><i style="background:var(--sol)"></i>Ruta ${c.hw} km</span>${c.dec?`<span><i class="d"></i>Declarada ${c.dec} (${c.cyc})</span>`:""}`}</div>`}
-function keyStats(c){const t=(v,l)=>`<div class="ks"><b class="num">${v}</b><span>${l}</span></div>`,cm=v=>String(v).replace(".",",");
- return`<div class="kstrip">${t(cm(c.kwh),"kWh batería")}${c.dc?t((c.src==="e"?"~":"")+c.dc+" kW","carga rápida")+t(Math.round(dcMin(c,60))+" min","10→80 % en UTE 60 kW"):c.ac?t(cm(c.ac)+" kW","carga AC (sin rápida)")+t(c.acH?cm(c.acH)+" h":"—","casa 0→100 %"):t("Sin DC","solo enchufe común o AC")+t(cm(c.eff),"kWh cada 100 km")}</div>`}
+ <text x="22" y="148" font-size="10" fill="var(--muted)" font-family="var(--mono)">0<\/text><text x="238" y="148" font-size="10" fill="var(--muted)" font-family="var(--mono)" text-anchor="end">${mx} km<\/text><\/svg>
+ <div class="gv"><b class="num">${c.rng}<\/b><span>${hyb?"km eléctricos reales":"km reales en ciudad"}<\/span><\/div><\/div>
+ <div class="glg">${hyb?`<span>Total con nafta ${c.total.toLocaleString("es-UY")} km<\/span>${c.dec?`<span>Declarada eléctrica ${c.dec} (${c.cyc})<\/span>`:""}`:`<span><i style="background:var(--sol)"><\/i>Ruta ${c.hw} km<\/span>${c.dec?`<span><i class="d"><\/i>Declarada ${c.dec} (${c.cyc})<\/span>`:""}`}<\/div>`}
+function keyStats(c){const t=(v,l)=>`<div class="ks"><b class="num">${v}<\/b><span>${l}<\/span><\/div>`,cm=v=>String(v).replace(".",",");
+ return`<div class="kstrip">${t(cm(c.kwh),"kWh batería")}${c.dc?t((c.src==="e"?"~":"")+c.dc+" kW","carga rápida")+t(Math.round(dcMin(c,60))+" min","10→80 % en UTE 60 kW"):c.ac?t(cm(c.ac)+" kW","carga AC (sin rápida)")+t(c.acH?cm(c.acH)+" h":"—","casa 0→100 %"):t("Sin DC","solo enchufe común o AC")+t(cm(c.eff),"kWh cada 100 km")}<\/div>`}
 function ownStrip(c){const {e,mt,pt,sg,t}=ownNums(c);const P=v=>Math.max(2,Math.round(v/t*100));
- return`<button class="own" id="ownJump"><span class="row" style="justify-content:space-between;align-items:baseline"><span class="eyebrow">Tenerlo, por mes</span><b class="num">${fmtU(Math.round(t))}</b></span>
- <span class="ob"><i style="width:${P(e)}%;background:var(--sol)"></i><i style="width:${P(sg)}%;background:var(--accent)"></i><i style="width:${P(pt)}%;background:#FF8A3D"></i><i style="width:${P(mt)}%;background:#5B6B63"></i></span>
- <span class="ol"><span><i style="background:var(--sol)"></i>${c.type==="E"?"Energía":"Luz y nafta"} ${fmtU(Math.round(e))}</span><span><i style="background:var(--accent)"></i>Seguro ${fmtU(Math.round(sg))}</span><span><i style="background:#FF8A3D"></i>Patente ${fmtU(Math.round(pt))}</span><span><i style="background:#5B6B63"></i>Mantenimiento ${fmtU(Math.round(mt))}</span></span></button>`}
+ return`<button class="own" id="ownJump"><span class="row" style="justify-content:space-between;align-items:baseline"><span class="eyebrow">Tenerlo, por mes<\/span><b class="num">${fmtU(Math.round(t))}<\/b><\/span>
+ <span class="ob"><i style="width:${P(e)}%;background:var(--sol)"><\/i><i style="width:${P(sg)}%;background:var(--accent)"><\/i><i style="width:${P(pt)}%;background:#FF8A3D"><\/i><i style="width:${P(mt)}%;background:#5B6B63"><\/i><\/span>
+ <span class="ol"><span><i style="background:var(--sol)"><\/i>${c.type==="E"?"Energía":"Luz y nafta"} ${fmtU(Math.round(e))}<\/span><span><i style="background:var(--accent)"><\/i>Seguro ${fmtU(Math.round(sg))}<\/span><span><i style="background:#FF8A3D"><\/i>Patente ${fmtU(Math.round(pt))}<\/span><span><i style="background:#5B6B63"><\/i>Mantenimiento ${fmtU(Math.round(mt))}<\/span><\/span><\/button>`}
 function maintPanel(c){const p=c.post;const m=c.type==="E"?maint(c,15000,5):maintHyb(c,15000,5),mi=maintICE(c,15000,5);
  const svcTxt=p.svc?`US$ ${Math.min(...p.svc)}–${Math.max(...p.svc)}`:p.int?`~US$ ${p.unit}`:"—";
  const lvlCls=p.lvl===3?"i0":p.lvl===2?"i5":"i9";
- return `<div class="panel"><h3>Mantenimiento y posventa <span class="src ${p.s}">${SRCL[p.s]}</span></h3>
- <div class="grid2"><div class="kv"><span>Service</span><b style="font-size:1rem">${p.int?`cada ${p.int.toLocaleString("es-UY")} km`:"sin intervalo fijo"}</b><small>o cada ${p.t} meses, lo que ocurra primero</small></div>
- <div class="kv"><span>Costo por service</span><b>${svcTxt}</b>${p.model?"<small>tarifario oficial con IVA, alineación y balanceo incluidos</small>":p.svc?"<small>lista oficial; el de 100.000 km ~US$ 400</small>":"<small>estimado; confirmá con la marca</small>"}</div>
- <div class="kv"><span>Talleres</span><b style="font-size:1rem"><span class="tag ${lvlCls}" style="font-size:.78rem">${LVL[p.lvl]}</span></b></div>
- <div class="kv"><span>5 años · 75.000 km</span><b>${fmtU(sum(m))}</b><small>a nafta (7 L/100 km): ${fmtU(sum(mi))}</small></div></div>
- ${p.first?`<p>${p.first}.</p>`:""}
- ${p.model?`<div class="scroll"><table><tr><th>Service</th><th style="text-align:right">Precio</th><th style="text-align:right">≈ US$</th></tr>${p.sched.map((k,i)=>`<tr><td>${(k*1000).toLocaleString("es-UY")} km</td><td class="n">$ ${SVCM[c.mk+"|"+c.md].uyu[i].toLocaleString("es-UY")}</td><td class="n">${p.svc[i]}</td></tr>`).join("")}</table></div><p class="note" style="margin:0">Fuente: tarifario web de Grupo Fiancar (postventa.grupofiancar.com), consultado el 8/10/2026. Sin alineación y balanceo sale entre 25% y 50% menos.</p>`:""}
- <p><b style="color:var(--fg)">Red:</b> ${p.net}.</p><p><b style="color:var(--fg)">Repuestos:</b> ${p.parts}</p>
- <div class="scroll"><table><tr><th>5 años</th><th style="text-align:right">${c.type==="E"?"Eléctrico":"Este híbrido"}</th><th style="text-align:right">Nafta (7 L/100 km)</th></tr>
- <tr><td>Services</td><td class="n">${fmtU(m.svc)}</td><td class="n">${fmtU(mi.svc)}</td></tr>
- <tr><td>Cubiertas</td><td class="n">${fmtU(m.tires)}</td><td class="n">${fmtU(mi.tires)}</td></tr>
- <tr><td>Frenos</td><td class="n">${fmtU(m.brakes)}</td><td class="n">${fmtU(mi.brakes)}</td></tr>
- <tr><td>Batería 12 V</td><td class="n">${fmtU(m.b12)}</td><td class="n">${fmtU(mi.b12)}</td></tr></table></div>
- <p class="note">Las reparaciones en garantía se hacen en el service oficial. Alineación, balanceo y rotación no suelen estar incluidos y se pueden hacer en cualquier gomería sin perder la garantía.</p></div>`}
+ return `<div class="panel"><h3>Mantenimiento y posventa <span class="src ${p.s}">${SRCL[p.s]}<\/span><\/h3>
+ <div class="grid2"><div class="kv"><span>Service<\/span><b style="font-size:1rem">${p.int?`cada ${p.int.toLocaleString("es-UY")} km`:"sin intervalo fijo"}<\/b><small>o cada ${p.t} meses, lo que ocurra primero<\/small><\/div>
+ <div class="kv"><span>Costo por service<\/span><b>${svcTxt}<\/b>${p.model?"<small>tarifario oficial con IVA, alineación y balanceo incluidos<\/small>":p.svc?"<small>lista oficial; el de 100.000 km ~US$ 400<\/small>":"<small>estimado; confirmá con la marca<\/small>"}<\/div>
+ <div class="kv"><span>Talleres<\/span><b style="font-size:1rem"><span class="tag ${lvlCls}" style="font-size:.78rem">${LVL[p.lvl]}<\/span><\/b><\/div>
+ <div class="kv"><span>5 años · 75.000 km<\/span><b>${fmtU(sum(m))}<\/b><small>a nafta (7 L/100 km): ${fmtU(sum(mi))}<\/small><\/div><\/div>
+ ${p.first?`<p>${p.first}.<\/p>`:""}
+ ${p.model?`<div class="scroll"><table><tr><th>Service<\/th><th style="text-align:right">Precio<\/th><th style="text-align:right">≈ US$<\/th><\/tr>${p.sched.map((k,i)=>`<tr><td>${(k*1000).toLocaleString("es-UY")} km<\/td><td class="n">$ ${SVCM[c.mk+"|"+c.md].uyu[i].toLocaleString("es-UY")}<\/td><td class="n">${p.svc[i]}<\/td><\/tr>`).join("")}<\/table><\/div><p class="note" style="margin:0">Fuente: tarifario web de Grupo Fiancar (postventa.grupofiancar.com), consultado el 8/10/2026. Sin alineación y balanceo sale entre 25% y 50% menos.<\/p>`:""}
+ <p><b style="color:var(--fg)">Red:<\/b> ${p.net}.<\/p><p><b style="color:var(--fg)">Repuestos:<\/b> ${p.parts}<\/p>
+ <div class="scroll"><table><tr><th>5 años<\/th><th style="text-align:right">${c.type==="E"?"Eléctrico":"Este híbrido"}<\/th><th style="text-align:right">Nafta (7 L/100 km)<\/th><\/tr>
+ <tr><td>Services<\/td><td class="n">${fmtU(m.svc)}<\/td><td class="n">${fmtU(mi.svc)}<\/td><\/tr>
+ <tr><td>Cubiertas<\/td><td class="n">${fmtU(m.tires)}<\/td><td class="n">${fmtU(mi.tires)}<\/td><\/tr>
+ <tr><td>Frenos<\/td><td class="n">${fmtU(m.brakes)}<\/td><td class="n">${fmtU(mi.brakes)}<\/td><\/tr>
+ <tr><td>Batería 12 V<\/td><td class="n">${fmtU(m.b12)}<\/td><td class="n">${fmtU(mi.b12)}<\/td><\/tr><\/table><\/div>
+ <p class="note">Las reparaciones en garantía se hacen en el service oficial. Alineación, balanceo y rotación no suelen estar incluidos y se pueden hacer en cualquier gomería sin perder la garantía.<\/p><\/div>`}
 function openCar(id){try{const _c=CARS[id];if(_c)track("ficha",label(_c))}catch(e){}const c=CARS[id];const homeV=c.eff*2.98,homeS=c.eff*10.31,dc=c.eff*(11.8+132.9/30),naf=7*90.45,hyb=c.type!=="E";
- $("#sheetCard").innerHTML=`<div class="hd"><div><div class="mk">${c.mk} · ${BODY[c.body]}</div><h2 style="font-size:1.6rem">${c.md}</h2><div style="color:var(--muted)">${c.vr!=="—"?c.vr:"Versión única"}</div></div><button class="x" id="xClose" aria-label="Cerrar">✕</button></div>
- <div class="big">${fmtU(c.price)}</div>
- <div class="note" style="margin-top:-10px">Precio de lista con IVA al ${DATES.price} · ${(w=>w?(w.diff?`${w.diff<0?"bajó":"subió"} ${fmtU(Math.abs(w.diff))} desde que lo seguís (${w.d})`:`lo seguís desde el ${w.d}`):"seguilo para enterarte si cambia")(watchInfo(c))}</div>
- <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag ${hyb?"hy":""}">${TYPE[c.type]}</span>${c.top?`<span class="tag top">#${c.top} en ventas 2025</span>`:""}${imesiTag(c)}</div>
+ $("#sheetCard").innerHTML=`<div class="hd"><div><div class="mk">${c.mk} · ${BODY[c.body]}<\/div><h2 style="font-size:1.6rem">${c.md}<\/h2><div style="color:var(--muted)">${c.vr!=="—"?c.vr:"Versión única"}<\/div><\/div><button class="x" id="xClose" aria-label="Cerrar">✕<\/button><\/div>
+ <div class="big">${fmtU(c.price)}<\/div>
+ <div class="note" style="margin-top:-10px">Precio de lista con IVA al ${DATES.price} · ${(w=>w?(w.diff?`${w.diff<0?"bajó":"subió"} ${fmtU(Math.abs(w.diff))} desde que lo seguís (${w.d})`:`lo seguís desde el ${w.d}`):"seguilo para enterarte si cambia")(watchInfo(c))}<\/div>
+ <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag ${hyb?"hy":""}">${TYPE[c.type]}<\/span>${c.top?`<span class="tag top">#${c.top} en ventas 2025<\/span>`:""}${imesiTag(c)}<\/div>
  ${gauge(c)}${keyStats(c)}${ownStrip(c)}
  ${hyb?`<div class="panel"><div class="grid2">
-  <div class="kv"><span>Autonomía eléctrica real</span><b>${c.rng} km</b><small>${c.dec?`declarada ${c.dec} km ${c.cyc}`:"sin dato declarado"}</small></div>
-  <div class="kv"><span>Autonomía total</span><b>${c.total.toLocaleString("es-UY")} km</b><small>${c.comb?"declarada, con nafta":"estimada, con tanque de 50 L"}</small></div>
-  <div class="kv"><span>Batería</span><b>${c.kwh} kWh</b></div>
-  <div class="kv"><span>Nafta con batería vacía</span><b>~${c.lcs.toLocaleString("es-UY")} L/100</b><small>estimado en uso mixto</small></div>
-  <div class="kv"><span>Consumo eléctrico est.</span><b>${c.eff} kWh/100</b></div>
-  <div class="kv"><span>Patente</span><b>5%</b><small>como un auto a nafta</small></div></div>
-  <p>${c.type==="R"?"El motor a nafta solo genera electricidad: las ruedas siempre las mueve el motor eléctrico.":"Usa primero la batería y después funciona como un híbrido común."} Si cargás todas las noches y hacés menos de ${c.rng} km por día, casi no usás nafta.</p></div>`:`<div class="grid2">
-  <div class="kv panel"><span>Consumo estimado</span><b>${c.eff} kWh/100</b></div>
-  <div class="kv panel"><span>km por US$1.000</span><b>${c.kmusd}</b></div></div>`}
+  <div class="kv"><span>Autonomía eléctrica real<\/span><b>${c.rng} km<\/b><small>${c.dec?`declarada ${c.dec} km ${c.cyc}`:"sin dato declarado"}<\/small><\/div>
+  <div class="kv"><span>Autonomía total<\/span><b>${c.total.toLocaleString("es-UY")} km<\/b><small>${c.comb?"declarada, con nafta":"estimada, con tanque de 50 L"}<\/small><\/div>
+  <div class="kv"><span>Batería<\/span><b>${c.kwh} kWh<\/b><\/div>
+  <div class="kv"><span>Nafta con batería vacía<\/span><b>~${c.lcs.toLocaleString("es-UY")} L/100<\/b><small>estimado en uso mixto<\/small><\/div>
+  <div class="kv"><span>Consumo eléctrico est.<\/span><b>${c.eff} kWh/100<\/b><\/div>
+  <div class="kv"><span>Patente<\/span><b>5%<\/b><small>como un auto a nafta<\/small><\/div><\/div>
+  <p>${c.type==="R"?"El motor a nafta solo genera electricidad: las ruedas siempre las mueve el motor eléctrico.":"Usa primero la batería y después funciona como un híbrido común."} Si cargás todas las noches y hacés menos de ${c.rng} km por día, casi no usás nafta.<\/p><\/div>`:`<div class="grid2">
+  <div class="kv panel"><span>Consumo estimado<\/span><b>${c.eff} kWh/100<\/b><\/div>
+  <div class="kv panel"><span>km por US$1.000<\/span><b>${c.kmusd}<\/b><\/div><\/div>`}
  ${chargePanel(c)}
  ${maintPanel(c)}
- <div class="panel"><h3>Costo cada 100 km</h3><div class="scroll"><table>
-  <tr><td>Casa, horario valle</td><td class="n best">${fmtP(homeV)}</td></tr>
-  <tr><td>Casa, residencial simple</td><td class="n">${fmtP(homeS)}</td></tr>
-  ${hyb?`<tr><td>Este auto con batería vacía (${c.lcs.toLocaleString("es-UY")} L)</td><td class="n">${fmtP(c.lcs*90.45)}</td></tr>`:`<tr><td>UTE carga rápida</td><td class="n">${fmtP(dc)}</td></tr>`}
-  <tr><td>Auto a nafta (7 L/100 km)</td><td class="n">${fmtP(naf)}</td></tr></table></div></div>
+ <div class="panel"><h3>Costo cada 100 km<\/h3><div class="scroll"><table>
+  <tr><td>Casa, horario valle<\/td><td class="n best">${fmtP(homeV)}<\/td><\/tr>
+  <tr><td>Casa, residencial simple<\/td><td class="n">${fmtP(homeS)}<\/td><\/tr>
+  ${hyb?`<tr><td>Este auto con batería vacía (${c.lcs.toLocaleString("es-UY")} L)<\/td><td class="n">${fmtP(c.lcs*90.45)}<\/td><\/tr>`:`<tr><td>UTE carga rápida<\/td><td class="n">${fmtP(dc)}<\/td><\/tr>`}
+  <tr><td>Auto a nafta (7 L/100 km)<\/td><td class="n">${fmtP(naf)}<\/td><\/tr><\/table><\/div><\/div>
  ${ownPanel(c)}
- <div class="panel"><h3>Garantía de la marca</h3><p>${WARR[c.mk]||"Consultar al concesionario"}</p>${c.note?`<p>${c.note}</p>`:""}</div>
- <div class="row"><button class="btn ghost" id="bCost">Calcular mi ahorro</button><button class="btn ghost" id="bTrip">Planear viaje</button><button class="btn ghost" id="bShare">Compartir</button><button class="btn ghost" id="bWatch">${WATCH[keyOf(c)]?"★ Dejar de seguir":"☆ Seguir precio"}</button></div>
- <details class="srcd"><summary>De dónde salen estos datos</summary><ul class="clean" style="font-size:.84rem">
- <li><b>Precio</b>: lista oficial 0 km publicada por Autoblog, ${DATES.price}.</li>
- <li><b>Autonomía declarada</b>: ficha de la marca, ciclo ${c.cyc||"declarado"}. La real y en ruta son cálculo de Kilowá.</li>
- <li><b>Carga</b>: <span class="src ${c.src}">${SRCL[c.src]}</span> ${c.src==="l"?"ficha del lanzamiento en Uruguay":c.src==="i"?"ficha de fábrica internacional":"estimado por tamaño de batería"}.</li>
- <li><b>Service</b>: ${c.post.model?`tarifario oficial del importador, ${DATES.svcOfficial}`:c.post.svc?"lista oficial de la marca en Uruguay":"estimado por tamaño y marca"}.</li>
- <li><b>Seguro</b>: estimado de Kilowá (${DATES.ins}), no es una cotización.</li>
- <li><b>IMESI y patente</b>: normativa vigente (${DATES.imesi}).</li></ul></details>
- <div class="actbar"><button class="btn ghost" id="bCmp">Comparar</button><button class="btn" id="bQuote">Pedir cotización</button></div>`;
+ <div class="panel"><h3>Garantía de la marca<\/h3><p>${WARR[c.mk]||"Consultar al concesionario"}<\/p>${c.note?`<p>${c.note}<\/p>`:""}<\/div>
+ <div class="row"><button class="btn ghost" id="bCost">Calcular mi ahorro<\/button><button class="btn ghost" id="bTrip">Planear viaje<\/button><button class="btn ghost" id="bShare">Compartir<\/button><button class="btn ghost" id="bWatch">${WATCH[keyOf(c)]?"★ Dejar de seguir":"☆ Seguir precio"}<\/button><\/div>
+ <details class="srcd"><summary>De dónde salen estos datos<\/summary><ul class="clean" style="font-size:.84rem">
+ <li><b>Precio<\/b>: lista oficial 0 km publicada por Autoblog, ${DATES.price}.<\/li>
+ <li><b>Autonomía declarada<\/b>: ficha de la marca, ciclo ${c.cyc||"declarado"}. La real y en ruta son cálculo de Kilowá.<\/li>
+ <li><b>Carga<\/b>: <span class="src ${c.src}">${SRCL[c.src]}<\/span> ${c.src==="l"?"ficha del lanzamiento en Uruguay":c.src==="i"?"ficha de fábrica internacional":"estimado por tamaño de batería"}.<\/li>
+ <li><b>Service<\/b>: ${c.post.model?`tarifario oficial del importador, ${DATES.svcOfficial}`:c.post.svc?"lista oficial de la marca en Uruguay":"estimado por tamaño y marca"}.<\/li>
+ <li><b>Seguro<\/b>: estimado de Kilowá (${DATES.ins}), no es una cotización.<\/li>
+ <li><b>IMESI y patente<\/b>: normativa vigente (${DATES.imesi}).<\/li><\/ul><\/details>
+ <div class="actbar"><button class="btn ghost" id="bCmp">Comparar<\/button><button class="btn" id="bQuote">Pedir cotización<\/button><\/div>`;
  $("#sheet").hidden=false;$("#sheetCard").scrollTop=0;$("#xClose").onclick=closeSheet;
  $("#bCmp").onclick=()=>{const prev=[vs[0],vs[1]].find(x=>x!==id&&Math.abs(CARS[x].price-c.price)/c.price<.4);vs=[id,prev??rival(id)];closeSheet();show("cmp")};
  $("#bCost").onclick=()=>{$("#cCar").value=id;closeSheet();show("cost");calc()};
@@ -918,24 +919,24 @@ function openCar(id){try{const _c=CARS[id];if(_c)track("ficha",label(_c))}catch(
 
 // Pedir cotización: se guarda en la base de Kilowá y se le reenvía al concesionario oficial de la marca
 const DEPS=["Artigas","Canelones","Cerro Largo","Colonia","Durazno","Flores","Florida","Lavalleja","Maldonado","Montevideo","Paysandú","Río Negro","Rivera","Rocha","Salto","San José","Soriano","Tacuarembó","Treinta y Tres"];
-function quoteForm(c,back){const prev=store.get("voltio.qprofile",{});const opt=(n,arr,v)=>`<div class="opts" role="radiogroup">${arr.map(([k,t])=>`<button type="button" class="chip" data-g="${n}" data-v="${k}" aria-pressed="${k===v}">${t}</button>`).join("")}</div>`;
- $("#sheetCard").innerHTML=`<div class="hd"><div><div class="mk">Pedir cotización</div><h2 style="font-size:1.4rem">${label(c)}</h2><div class="num">${c.price?fmtU(c.price)+" de lista":"Precio a consultar"}</div></div><button class="x" id="xClose" aria-label="Cerrar">✕</button></div>
- <p class="note" style="margin:0">Es gratis y sin compromiso. Kilowá le pasa tu pedido al concesionario oficial de ${c.mk} y ellos te contactan.</p>
+function quoteForm(c,back){const prev=store.get("voltio.qprofile",{});const opt=(n,arr,v)=>`<div class="opts" role="radiogroup">${arr.map(([k,t])=>`<button type="button" class="chip" data-g="${n}" data-v="${k}" aria-pressed="${k===v}">${t}<\/button>`).join("")}<\/div>`;
+ $("#sheetCard").innerHTML=`<div class="hd"><div><div class="mk">Pedir cotización<\/div><h2 style="font-size:1.4rem">${label(c)}<\/h2><div class="num">${c.price?fmtU(c.price)+" de lista":"Precio a consultar"}<\/div><\/div><button class="x" id="xClose" aria-label="Cerrar">✕<\/button><\/div>
+ <p class="note" style="margin:0">Es gratis y sin compromiso. Kilowá le pasa tu pedido al concesionario oficial de ${c.mk} y ellos te contactan.<\/p>
  <form class="qf" id="qf" novalidate>
- <label>Nombre<input class="inp" name="name" autocomplete="name" value="${(prev.name||"").replace(/"/g,"&quot;")}" required></label>
- <label>Celular o WhatsApp<input class="inp" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="09X XXX XXX" value="${prev.phone||""}"></label>
- <label>Email (opcional)<input class="inp" name="email" type="email" autocomplete="email" value="${prev.email||""}"></label>
- <label>Departamento<select name="dep">${DEPS.map(d=>`<option${d===(prev.dep||"Montevideo")?" selected":""}>${d}</option>`).join("")}</select></label>
- <div><div style="font-size:.84rem;color:var(--muted);margin-bottom:4px">¿Cuándo pensás comprar?</div>${opt("when",[["1","Este mes"],["3","En 1 a 3 meses"],["6","En más de 3 meses"]],"3")}</div>
- <div><div style="font-size:.84rem;color:var(--muted);margin-bottom:4px">Forma de pago</div>${opt("pay",[["cash","Contado"],["fin","Financiado"],["trade","Entrego mi auto"]],"cash")}</div>
- <div><div style="font-size:.84rem;color:var(--muted);margin-bottom:4px">Cómo preferís que te contacten</div>${opt("via",[["wa","WhatsApp"],["call","Llamada"],["mail","Email"]],"wa")}</div>
- <label class="chk"><input type="checkbox" name="test"> Quiero coordinar una prueba de manejo</label>
- <label>Comentario (opcional)<textarea name="msg" placeholder="Color, versión, dudas sobre la carga en casa…"></textarea></label>
- <label class="chk"><input type="checkbox" name="ok" required> <span>Acepto que Kilowá guarde estos datos y los envíe a concesionarios oficiales de ${c.mk} para que me contacten por este auto, según la <a href="/privacidad.html" target="_blank">política de privacidad</a>. Puedo pedir que los borren cuando quiera (Ley 18.331).</span></label>
- <div class="err" id="qErr" aria-live="polite"></div>
- <div class="row"><button class="btn" type="submit" id="qSend">Pedir cotización</button><button class="btn ghost" type="button" id="qBack">Volver</button></div>
- <p class="note" style="margin:0">Kilowá no cobra por aparecer en el catálogo ni cambia el orden de los autos por acuerdos comerciales. Si en el futuro hay contenido pago, va a decir «Patrocinado».</p>
- </form>`;
+ <label>Nombre<input class="inp" name="name" autocomplete="name" value="${(prev.name||"").replace(/"/g,"&quot;")}" required><\/label>
+ <label>Celular o WhatsApp<input class="inp" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="09X XXX XXX" value="${prev.phone||""}"><\/label>
+ <label>Email (opcional)<input class="inp" name="email" type="email" autocomplete="email" value="${prev.email||""}"><\/label>
+ <label>Departamento<select name="dep">${DEPS.map(d=>`<option${d===(prev.dep||"Montevideo")?" selected":""}>${d}<\/option>`).join("")}<\/select><\/label>
+ <div><div style="font-size:.84rem;color:var(--muted);margin-bottom:4px">¿Cuándo pensás comprar?<\/div>${opt("when",[["1","Este mes"],["3","En 1 a 3 meses"],["6","En más de 3 meses"]],"3")}<\/div>
+ <div><div style="font-size:.84rem;color:var(--muted);margin-bottom:4px">Forma de pago<\/div>${opt("pay",[["cash","Contado"],["fin","Financiado"],["trade","Entrego mi auto"]],"cash")}<\/div>
+ <div><div style="font-size:.84rem;color:var(--muted);margin-bottom:4px">Cómo preferís que te contacten<\/div>${opt("via",[["wa","WhatsApp"],["call","Llamada"],["mail","Email"]],"wa")}<\/div>
+ <label class="chk"><input type="checkbox" name="test"> Quiero coordinar una prueba de manejo<\/label>
+ <label>Comentario (opcional)<textarea name="msg" placeholder="Color, versión, dudas sobre la carga en casa…"><\/textarea><\/label>
+ <label class="chk"><input type="checkbox" name="ok" required> <span>Acepto que Kilowá guarde estos datos y los envíe a concesionarios oficiales de ${c.mk} para que me contacten por este auto, según la <a href="/privacidad.html" target="_blank">política de privacidad<\/a>. Puedo pedir que los borren cuando quiera (Ley 18.331).<\/span><\/label>
+ <div class="err" id="qErr" aria-live="polite"><\/div>
+ <div class="row"><button class="btn" type="submit" id="qSend">Pedir cotización<\/button><button class="btn ghost" type="button" id="qBack">Volver<\/button><\/div>
+ <p class="note" style="margin:0">Kilowá no cobra por aparecer en el catálogo ni cambia el orden de los autos por acuerdos comerciales. Si en el futuro hay contenido pago, va a decir «Patrocinado».<\/p>
+ <\/form>`;
  $("#sheet").hidden=false;$("#xClose").onclick=closeSheet;$("#qBack").onclick=back||closeSheet;
  const f=$("#qf");const pick={when:"3",pay:"cash",via:"wa"};
  f.querySelectorAll(".chip[data-g]").forEach(b=>b.onclick=()=>{pick[b.dataset.g]=b.dataset.v;f.querySelectorAll(`.chip[data-g=${b.dataset.g}]`).forEach(x=>x.setAttribute("aria-pressed",x===b))});
@@ -949,14 +950,14 @@ function quoteForm(c,back){const prev=store.get("voltio.qprofile",{});const opt=
   store.set("voltio.qprofile",{name:d.name.trim(),phone:d.phone,email:d.email,dep:d.dep});
   const q={car:label(c),key:keyOf(c),price:c.price,when:pick.when,pay:pick.pay,via:pick.via,test:!!d.test,msg:d.msg||"",dep:d.dep,date:new Date().toLocaleDateString("es-UY")};
   const L=store.get("voltio.quotes",[]);L.unshift(q);store.set("voltio.quotes",L.slice(0,20));
-  $("#sheetCard").innerHTML=`<div class="hd"><div><div class="mk">Pedido enviado</div><h2 style="font-size:1.4rem">${label(c)}</h2></div><button class="x" id="xClose" aria-label="Cerrar">✕</button></div>
-  <div class="save"><b>¡Listo, ${d.name.trim().split(" ")[0]}!</b><div style="font-size:.9rem">Le pasamos tu pedido al concesionario oficial de ${c.mk}. Te van a contactar por ${pick.via==="wa"?"WhatsApp":pick.via==="call"?"teléfono":"email"}, normalmente en 1 o 2 días hábiles.</div></div>
-  <p class="note" style="margin:0">Una copia queda en «Mis pedidos», en Info. Para que borremos tus datos, escribinos a hola@kilowauy.com.</p>
-  <div class="panel"><h3>Mientras tanto</h3><ul class="clean" style="font-size:.88rem"><li>Preguntá por la garantía de batería: ${WARR[c.mk]||COMW[c.mk]||"consultala"}.</li>${c.com?'<li>Pedí por escrito la carga útil, el volumen y la autonomía con carga.</li><li>Consultá beneficios de IMESI para empresas y la tarifa UTE para cargar en el depósito.</li>':'<li>Pedí el precio del service de 20.000 km por escrito.</li><li>Si vas a cargar en casa, pedí presupuesto del cargador e instalación y consultá la tarifa doble horario de UTE.</li>'}</ul></div>
-  <div class="row"><button class="btn" id="qDone">Volver a la ficha</button></div>`;
+  $("#sheetCard").innerHTML=`<div class="hd"><div><div class="mk">Pedido enviado<\/div><h2 style="font-size:1.4rem">${label(c)}<\/h2><\/div><button class="x" id="xClose" aria-label="Cerrar">✕<\/button><\/div>
+  <div class="save"><b>¡Listo, ${d.name.trim().split(" ")[0]}!<\/b><div style="font-size:.9rem">Le pasamos tu pedido al concesionario oficial de ${c.mk}. Te van a contactar por ${pick.via==="wa"?"WhatsApp":pick.via==="call"?"teléfono":"email"}, normalmente en 1 o 2 días hábiles.<\/div><\/div>
+  <p class="note" style="margin:0">Una copia queda en «Mis pedidos», en Info. Para que borremos tus datos, escribinos a hola@kilowauy.com.<\/p>
+  <div class="panel"><h3>Mientras tanto<\/h3><ul class="clean" style="font-size:.88rem"><li>Preguntá por la garantía de batería: ${WARR[c.mk]||COMW[c.mk]||"consultala"}.<\/li>${c.com?'<li>Pedí por escrito la carga útil, el volumen y la autonomía con carga.<\/li><li>Consultá beneficios de IMESI para empresas y la tarifa UTE para cargar en el depósito.<\/li>':'<li>Pedí el precio del service de 20.000 km por escrito.<\/li><li>Si vas a cargar en casa, pedí presupuesto del cargador e instalación y consultá la tarifa doble horario de UTE.<\/li>'}<\/ul><\/div>
+  <div class="row"><button class="btn" id="qDone">Volver a la ficha<\/button><\/div>`;
   $("#xClose").onclick=closeSheet;$("#qDone").onclick=()=>c.reopen?c.reopen():openCar(c.id);renderQuotes()})}}
 function renderQuotes(){const L=store.get("voltio.quotes",[]);const el=$("#myQuotes");if(!el)return;
- el.innerHTML=L.length?`<ul class="clean" style="font-size:.86rem">${L.map((q,i)=>`<li><b>${q.car}</b> · ${q.date} · ${q.dep} · ${{1:"este mes",3:"1–3 meses",6:"más de 3 meses"}[q.when]} · ${{cash:"contado",fin:"financiado",trade:"entrega su auto"}[q.pay]}${q.test?" · prueba de manejo":""}</li>`).join("")}</ul><button class="btn ghost" id="qClear">Borrar mis pedidos y datos</button>`:'<p class="note" style="margin:0">Todavía no pediste ninguna cotización.</p>';
+ el.innerHTML=L.length?`<ul class="clean" style="font-size:.86rem">${L.map((q,i)=>`<li><b>${q.car}<\/b> · ${q.date} · ${q.dep} · ${{1:"este mes",3:"1–3 meses",6:"más de 3 meses"}[q.when]} · ${{cash:"contado",fin:"financiado",trade:"entrega su auto"}[q.pay]}${q.test?" · prueba de manejo":""}<\/li>`).join("")}<\/ul><button class="btn ghost" id="qClear">Borrar mis pedidos y datos<\/button>`:'<p class="note" style="margin:0">Todavía no pediste ninguna cotización.<\/p>';
  const b=$("#qClear");if(b)b.onclick=()=>{store.set("voltio.quotes",[]);store.set("voltio.qprofile",{});renderQuotes()}}
 
 // ===== Vehículos comerciales eléctricos =====
@@ -1036,22 +1037,22 @@ document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>setSeg(b.datas
 const comLabel=c=>`${c.mk} ${c.md}${c.vr!=="—"?" "+c.vr:""}`;
 function renderCom(){const B=[...new Set(COM.map(c=>c.mk))].sort((a,b)=>a.localeCompare(b));
  const L=COM.filter(c=>(!comG||c.k.g===comG)&&(!comBrand||c.mk===comBrand)).sort((a,b)=>"ucb".indexOf(a.k.g)-"ucb".indexOf(b.k.g)||(a.price??1e9)-(b.price??1e9));
- $("#comBox").innerHTML=`<div class="panel"><h2>Vehículos comerciales eléctricos</h2><p>Utilitarios, furgones, camiones y buses 100% eléctricos que se venden en Uruguay, con la cuenta de cuánto ahorra una empresa frente al gasoil. Varios utilitarios tienen beneficios de IMESI para contribuyentes de IRAE o IMEBA: consultalo con el importador.</p></div>
- <div class="chips" id="comChips">${[["","Todos"],...Object.entries(CG)].map(([k,t])=>`<button class="chip" data-g="${k}" aria-pressed="${k===comG}">${t}</button>`).join("")}</div>
- <div class="row"><div class="range"><label for="comBrand">Marca</label><select id="comBrand"><option value="">Todas las marcas</option>${B.map(m=>`<option${m===comBrand?" selected":""}>${m}</option>`).join("")}</select></div></div>
- <div class="count">${L.length} versiones de ${new Set(L.map(c=>c.mk)).size===1?"1 marca":new Set(L.map(c=>c.mk)).size+" marcas"} · ${L.filter(c=>c.price).length} con precio de lista público</div>
- <div class="list">${L.map(c=>`<button class="car" data-cid="${c.cid}"><div><div class="mk">${c.mk} · ${c.k.n}</div><div class="nm">${c.md}</div><div class="vr">${c.vr!=="—"?c.vr:"Versión única"}</div></div><div class="pr">${c.price?fmtU(c.price):'<span style="font:500 .85rem var(--body);color:var(--muted)">Precio a consultar</span>'}</div>
- <div class="stats">${c.kwh?`<span>Batería <b>${String(c.kwh).replace(".",",")} kWh</b></span>`:""}${c.rng?`<span>Real cargado <b>~${c.rng} km</b></span>`:c.x.rangeDec?`<span>Declarada <b>${c.x.rangeDec.split(" (")[0]}</b></span>`:""}${c.x.pbt?`<span>PBT <b>${(c.x.pbt/1000).toLocaleString("es-UY")} t</b></span>`:""}${c.x.vol?`<span>Carga <b>${String(c.x.vol).replace(".",",")} m³</b></span>`:""}${c.x.pax?`<span>Pasajeros <b>${c.x.pax}</b></span>`:""}</div>
- <div class="tags"><span class="tag">${CG[c.k.g]}</span>${COMI[c.mk]?`<span class="tag">${COMI[c.mk]}</span>`:""}</div></button>`).join("")}</div>
- <div class="warnbox">También circulan camiones y buses eléctricos de otras marcas (Volvo, SANY, Landking, Higer y BYD, entre otras) que se venden por licitación o pedido y no tienen ficha pública en Uruguay. Los vamos a sumar a medida que publiquen datos.</div>`;
+ $("#comBox").innerHTML=`<div class="panel"><h2>Vehículos comerciales eléctricos<\/h2><p>Utilitarios, furgones, camiones y buses 100% eléctricos que se venden en Uruguay, con la cuenta de cuánto ahorra una empresa frente al gasoil. Varios utilitarios tienen beneficios de IMESI para contribuyentes de IRAE o IMEBA: consultalo con el importador.<\/p><\/div>
+ <div class="chips" id="comChips">${[["","Todos"],...Object.entries(CG)].map(([k,t])=>`<button class="chip" data-g="${k}" aria-pressed="${k===comG}">${t}<\/button>`).join("")}<\/div>
+ <div class="row"><div class="range"><label for="comBrand">Marca<\/label><select id="comBrand"><option value="">Todas las marcas<\/option>${B.map(m=>`<option${m===comBrand?" selected":""}>${m}<\/option>`).join("")}<\/select><\/div><\/div>
+ <div class="count">${L.length} versiones de ${new Set(L.map(c=>c.mk)).size===1?"1 marca":new Set(L.map(c=>c.mk)).size+" marcas"} · ${L.filter(c=>c.price).length} con precio de lista público<\/div>
+ <div class="list">${L.map(c=>`<button class="car" data-cid="${c.cid}"><div><div class="mk">${c.mk} · ${c.k.n}<\/div><div class="nm">${c.md}<\/div><div class="vr">${c.vr!=="—"?c.vr:"Versión única"}<\/div><\/div><div class="pr">${c.price?fmtU(c.price):'<span style="font:500 .85rem var(--body);color:var(--muted)">Precio a consultar<\/span>'}<\/div>
+ <div class="stats">${c.kwh?`<span>Batería <b>${String(c.kwh).replace(".",",")} kWh<\/b><\/span>`:""}${c.rng?`<span>Real cargado <b>~${c.rng} km<\/b><\/span>`:c.x.rangeDec?`<span>Declarada <b>${c.x.rangeDec.split(" (")[0]}<\/b><\/span>`:""}${c.x.pbt?`<span>PBT <b>${(c.x.pbt/1000).toLocaleString("es-UY")} t<\/b><\/span>`:""}${c.x.vol?`<span>Carga <b>${String(c.x.vol).replace(".",",")} m³<\/b><\/span>`:""}${c.x.pax?`<span>Pasajeros <b>${c.x.pax}<\/b><\/span>`:""}<\/div>
+ <div class="tags"><span class="tag">${CG[c.k.g]}<\/span>${COMI[c.mk]?`<span class="tag">${COMI[c.mk]}<\/span>`:""}<\/div><\/button>`).join("")}<\/div>
+ <div class="warnbox">También circulan camiones y buses eléctricos de otras marcas (Volvo, SANY, Landking, Higer y BYD, entre otras) que se venden por licitación o pedido y no tienen ficha pública en Uruguay. Los vamos a sumar a medida que publiquen datos.<\/div>`;
  $("#comChips").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{comG=b.dataset.g;renderCom()});
  $("#comBrand").oninput=e=>{comBrand=e.target.value;renderCom()};
  $("#comBox").querySelectorAll(".car[data-cid]").forEach(b=>b.onclick=()=>openCom(+b.dataset.cid))}
 function openCom(cid){const c=COM[cid],k=c.k,x=c.x;
- const spec=(n,v,sm)=>v?`<div class="kv"><span>${n}</span><b>${v}</b>${sm?`<small>${sm}</small>`:""}</div>`:"";
- $("#sheetCard").innerHTML=`<div class="hd"><div><div class="mk">${c.mk} · ${k.n}</div><h2 style="font-size:1.6rem">${c.md}</h2><div style="color:var(--muted)">${c.vr!=="—"?c.vr:"Versión única"}</div></div><button class="x" id="xClose" aria-label="Cerrar">✕</button></div>
- <div class="big">${c.price?fmtU(c.price):"Precio a consultar"}</div>
- <div class="note" style="margin-top:-10px">${c.price?"Precio de lista con IVA al 8/10/2026.":"El vendedor no publica precio: se cotiza según configuración y cantidad."} Fuente: ${CSRC[x.src]}.</div>
+ const spec=(n,v,sm)=>v?`<div class="kv"><span>${n}<\/span><b>${v}<\/b>${sm?`<small>${sm}<\/small>`:""}<\/div>`:"";
+ $("#sheetCard").innerHTML=`<div class="hd"><div><div class="mk">${c.mk} · ${k.n}<\/div><h2 style="font-size:1.6rem">${c.md}<\/h2><div style="color:var(--muted)">${c.vr!=="—"?c.vr:"Versión única"}<\/div><\/div><button class="x" id="xClose" aria-label="Cerrar">✕<\/button><\/div>
+ <div class="big">${c.price?fmtU(c.price):"Precio a consultar"}<\/div>
+ <div class="note" style="margin-top:-10px">${c.price?"Precio de lista con IVA al 8/10/2026.":"El vendedor no publica precio: se cotiza según configuración y cantidad."} Fuente: ${CSRC[x.src]}.<\/div>
  <div class="panel"><div class="grid2">
  ${spec("Batería",c.kwh?String(c.kwh).replace(".",",")+" kWh":"","")}
  ${spec("Autonomía real cargado",c.rng?`~${c.rng} km`:"",c.rng?`estimada con ${k.eff} kWh/100 km`:"")}
@@ -1063,26 +1064,26 @@ function openCom(cid){const c=COM[cid],k=c.k,x=c.x;
  ${spec("Largo",x.len?String(x.len).replace(".",",")+" m":"","")}
  ${spec("Motor",x.kw?x.kw+" kW":"","")}
  ${spec("Carga",x.chg||"","")}
- </div><p class="note" style="margin:0">Los datos que faltan no están publicados en Uruguay: pedilos en la cotización.</p></div>
- <div class="panel"><h3>¿Cuánto ahorra frente a ${k.f==="n"?"nafta":"gasoil"}? <span class="src e">EST</span></h3>
+ <\/div><p class="note" style="margin:0">Los datos que faltan no están publicados en Uruguay: pedilos en la cotización.<\/p><\/div>
+ <div class="panel"><h3>¿Cuánto ahorra frente a ${k.f==="n"?"nafta":"gasoil"}? <span class="src e">EST<\/span><\/h3>
  <div class="ccalc">
- <label class="range">Km por día<input class="inp num" id="ccKm" type="number" min="10" step="10" value="${k.kmd}"></label>
- <label class="range">Días por mes<input class="inp num" id="ccD" type="number" min="1" max="31" value="24"></label>
- <label class="range">${k.f==="n"?"Nafta":"Gasoil 50-S"} ($/L)<input class="inp num" id="ccF" type="number" step="0.01" value="${k.f==="n"?90.45:62.79}"></label>
- <label class="range">Luz en el depósito ($/kWh)<input class="inp num" id="ccE" type="number" step="0.1" value="4"></label>
- <label class="range">Consumo ${k.f==="n"?"a nafta":"diésel"} (L/100 km)<input class="inp num" id="ccL" type="number" step="0.5" value="${k.l}"></label>
- </div><div id="ccOut"></div></div>
- <div class="panel"><h3>Garantía y vendedor</h3><p>${COMW[c.mk]||WARR[c.mk]||"Consultar al vendedor"}.</p><p><b style="color:var(--fg)">Vende:</b> ${COMI[c.mk]||"consultar"}.</p></div>
- <div class="row"><button class="btn" id="bCQ">Pedir cotización</button><button class="btn ghost" id="bCBack">Volver</button></div>`;
+ <label class="range">Km por día<input class="inp num" id="ccKm" type="number" min="10" step="10" value="${k.kmd}"><\/label>
+ <label class="range">Días por mes<input class="inp num" id="ccD" type="number" min="1" max="31" value="24"><\/label>
+ <label class="range">${k.f==="n"?"Nafta":"Gasoil 50-S"} ($/L)<input class="inp num" id="ccF" type="number" step="0.01" value="${k.f==="n"?90.45:62.79}"><\/label>
+ <label class="range">Luz en el depósito ($/kWh)<input class="inp num" id="ccE" type="number" step="0.1" value="4"><\/label>
+ <label class="range">Consumo ${k.f==="n"?"a nafta":"diésel"} (L/100 km)<input class="inp num" id="ccL" type="number" step="0.5" value="${k.l}"><\/label>
+ <\/div><div id="ccOut"><\/div><\/div>
+ <div class="panel"><h3>Garantía y vendedor<\/h3><p>${COMW[c.mk]||WARR[c.mk]||"Consultar al vendedor"}.<\/p><p><b style="color:var(--fg)">Vende:<\/b> ${COMI[c.mk]||"consultar"}.<\/p><\/div>
+ <div class="row"><button class="btn" id="bCQ">Pedir cotización<\/button><button class="btn ghost" id="bCBack">Volver<\/button><\/div>`;
  $("#sheet").hidden=false;$("#xClose").onclick=closeSheet;$("#bCBack").onclick=closeSheet;
  const run=()=>{const km=+$("#ccKm").value||0,d=+$("#ccD").value||0,pf=+$("#ccF").value||0,pe=+$("#ccE").value||0,l=+$("#ccL").value||0;const kmM=km*d;
   const eE=kmM*k.eff/100*1.1*pe,eI=kmM*l/100*pf,mE=kmM*k.mE*UYU,mI=kmM*k.mI*UYU;const save=(eI+mI)-(eE+mE);
-  const fit=c.rng?(c.rng*.9>=km?`<span class="tag i0">La batería alcanza para el día</span> con ~${Math.round(c.rng*.9-km)} km de margen.`:`<span class="tag i9">No alcanza para el día</span>: necesita una carga intermedia de ~${Math.round((km-c.rng*.9)*k.eff/100)} kWh.`):"";
-  $("#ccOut").innerHTML=`<div class="scroll"><table><tr><th>Por mes (${kmM.toLocaleString("es-UY")} km)</th><th style="text-align:right">Eléctrico</th><th style="text-align:right">${k.f==="n"?"Nafta":"Diésel"}</th></tr>
-  <tr><td>Energía</td><td class="n">${fmtP(eE)}</td><td class="n">${fmtP(eI)}</td></tr><tr><td>Mantenimiento (est.)</td><td class="n">${fmtP(mE)}</td><td class="n">${fmtP(mI)}</td></tr>
-  <tr><td><b>Total</b></td><td class="n best">${fmtP(eE+mE)}</td><td class="n"><b>${fmtP(eI+mI)}</b></td></tr></table></div>
-  <div class="save"><div class="kv"><span style="color:inherit">Ahorro por mes</span><b class="big" style="font-size:1.6rem">${fmtP(save)}</b></div><div class="num" style="font-size:.9rem">${fmtU(Math.round(save*12/UYU))} por año · ${fmtU(Math.round(save*60/UYU))} en 5 años</div></div>
-  <p style="margin:0">${fit}</p><p class="note" style="margin:0">Consumo eléctrico cargado de ${k.eff} kWh/100 km para un ${k.n.toLowerCase()}, con 10% de pérdidas al cargar. Mantenimiento estimado por km (eléctrico ~50% menos). La luz depende de tu tarifa UTE: cargando de noche en el depósito suele estar entre $3 y $5 por kWh.</p>`};
+  const fit=c.rng?(c.rng*.9>=km?`<span class="tag i0">La batería alcanza para el día<\/span> con ~${Math.round(c.rng*.9-km)} km de margen.`:`<span class="tag i9">No alcanza para el día<\/span>: necesita una carga intermedia de ~${Math.round((km-c.rng*.9)*k.eff/100)} kWh.`):"";
+  $("#ccOut").innerHTML=`<div class="scroll"><table><tr><th>Por mes (${kmM.toLocaleString("es-UY")} km)<\/th><th style="text-align:right">Eléctrico<\/th><th style="text-align:right">${k.f==="n"?"Nafta":"Diésel"}<\/th><\/tr>
+  <tr><td>Energía<\/td><td class="n">${fmtP(eE)}<\/td><td class="n">${fmtP(eI)}<\/td><\/tr><tr><td>Mantenimiento (est.)<\/td><td class="n">${fmtP(mE)}<\/td><td class="n">${fmtP(mI)}<\/td><\/tr>
+  <tr><td><b>Total<\/b><\/td><td class="n best">${fmtP(eE+mE)}<\/td><td class="n"><b>${fmtP(eI+mI)}<\/b><\/td><\/tr><\/table><\/div>
+  <div class="save"><div class="kv"><span style="color:inherit">Ahorro por mes<\/span><b class="big" style="font-size:1.6rem">${fmtP(save)}<\/b><\/div><div class="num" style="font-size:.9rem">${fmtU(Math.round(save*12/UYU))} por año · ${fmtU(Math.round(save*60/UYU))} en 5 años<\/div><\/div>
+  <p style="margin:0">${fit}<\/p><p class="note" style="margin:0">Consumo eléctrico cargado de ${k.eff} kWh/100 km para un ${k.n.toLowerCase()}, con 10% de pérdidas al cargar. Mantenimiento estimado por km (eléctrico ~50% menos). La luz depende de tu tarifa UTE: cargando de noche en el depósito suele estar entre $3 y $5 por kWh.<\/p>`};
  ["ccKm","ccD","ccF","ccE","ccL"].forEach(id=>$("#"+id).addEventListener("input",run));run();
  $("#bCQ").onclick=()=>quoteForm({...c,id:-1,reopen:()=>openCom(cid)},()=>openCom(cid))}
 function closeSheet(){$("#sheet").hidden=true}
@@ -1141,37 +1142,37 @@ function renderCmp(){const A=CARS[vs[0]],B=CARS[vs[1]];$("#vsA").value=A.id;$("#
  const R=vsCompare(A,B);const wa=R.filter(r=>r.win===1).length,wb=R.filter(r=>r.win===2).length;
  const pros=(side,X,Y)=>{const L=R.filter(r=>r.win===side).sort((p,q)=>q.score-p.score).map(r=>{const [x,y]=side===1?[r.a,r.b]:[r.b,r.a];return[r.pro,r.dif(x,y,X,Y)]});return [...L,...extras(X,Y)]};
  const pa=pros(1,A,B),pb=pros(2,B,A);
- const li=(p,cls)=>`<li class="${cls}"><span class="ic" aria-hidden="true">${cls==="pa"?"A":"B"}</span><div><b>${p[0]}</b><small>${p[1]}</small></div></li>`;
+ const li=(p,cls)=>`<li class="${cls}"><span class="ic" aria-hidden="true">${cls==="pa"?"A":"B"}<\/span><div><b>${p[0]}<\/b><small>${p[1]}<\/small><\/div><\/li>`;
  const top2=(L)=>{const t=L.slice(0,3).map(p=>p[0].charAt(0).toLowerCase()+p[0].slice(1));return t.length>1?t.slice(0,-1).join(", ")+" y "+t[t.length-1]:t[0]};
  const lead=wa===wb?`Empatan: cada uno gana en ${wa} categorías.`:`El ${A.md} gana en ${wa} de ${R.length} categorías y el ${B.md} en ${wb}; el resto son empates.`;
- const verdict=`${lead}${pa.length?` El <b>${label(A)}</b> conviene si buscás: ${top2(pa)}.`:""}${pb.length?` El <b>${label(B)}</b> conviene si buscás: ${top2(pb)}.`:""}`;
+ const verdict=`${lead}${pa.length?` El <b>${label(A)}<\/b> conviene si buscás: ${top2(pa)}.`:""}${pb.length?` El <b>${label(B)}<\/b> conviene si buscás: ${top2(pb)}.`:""}`;
  $("#vsBody").innerHTML=`
- <div class="vshead"><div class="vscar a"><div class="mk">${A.mk} · ${BODY[A.body]}</div><div class="nm">${A.md}</div><div class="vr">${A.vr!=="—"?A.vr:"Versión única"}</div><div class="pr">${fmtU(A.price)}</div><div class="sc"><b>${wa}</b> categorías</div><div class="row" style="gap:6px"><button class="chip" data-open="${A.id}">Ver ficha</button><button class="chip" data-quote="${A.id}">Cotizar</button></div></div>
- <div class="vspill" aria-hidden="true">VS</div>
- <div class="vscar b"><div class="mk">${B.mk} · ${BODY[B.body]}</div><div class="nm">${B.md}</div><div class="vr">${B.vr!=="—"?B.vr:"Versión única"}</div><div class="pr">${fmtU(B.price)}</div><div class="sc"><b>${wb}</b> categorías</div><div class="row" style="gap:6px"><button class="chip" data-open="${B.id}">Ver ficha</button><button class="chip" data-quote="${B.id}">Cotizar</button></div></div></div>
- <div class="panel verdict"><h2>Veredicto</h2><p>${verdict}</p></div>
+ <div class="vshead"><div class="vscar a"><div class="mk">${A.mk} · ${BODY[A.body]}<\/div><div class="nm">${A.md}<\/div><div class="vr">${A.vr!=="—"?A.vr:"Versión única"}<\/div><div class="pr">${fmtU(A.price)}<\/div><div class="sc"><b>${wa}<\/b> categorías<\/div><div class="row" style="gap:6px"><button class="chip" data-open="${A.id}">Ver ficha<\/button><button class="chip" data-quote="${A.id}">Cotizar<\/button><\/div><\/div>
+ <div class="vspill" aria-hidden="true">VS<\/div>
+ <div class="vscar b"><div class="mk">${B.mk} · ${BODY[B.body]}<\/div><div class="nm">${B.md}<\/div><div class="vr">${B.vr!=="—"?B.vr:"Versión única"}<\/div><div class="pr">${fmtU(B.price)}<\/div><div class="sc"><b>${wb}<\/b> categorías<\/div><div class="row" style="gap:6px"><button class="chip" data-open="${B.id}">Ver ficha<\/button><button class="chip" data-quote="${B.id}">Cotizar<\/button><\/div><\/div><\/div>
+ <div class="panel verdict"><h2>Veredicto<\/h2><p>${verdict}<\/p><\/div>
  <div class="pros">
-  <div class="panel"><h3>Por qué elegir el ${A.md}</h3>${pa.length?`<ul class="plist">${pa.map(p=>li(p,"pa")).join("")}</ul>`:'<p>No supera al otro en ninguna categoría.</p>'}</div>
-  <div class="panel"><h3>Por qué elegir el ${B.md}</h3>${pb.length?`<ul class="plist">${pb.map(p=>li(p,"pb")).join("")}</ul>`:'<p>No supera al otro en ninguna categoría.</p>'}</div>
- </div>
- <div class="panel"><h2>Categoría por categoría</h2>
- <div class="duels">${R.map(r=>`<div class="duel"><div class="dl">${r.lab}${r.tie?' <span class="tie">empate</span>':""}</div>
-  <div class="dv ${r.win===1?"w":""}">${r.fa}</div>
-  <div class="db" role="img" aria-label="${r.lab}: ${r.fa} contra ${r.fb}"><i class="ba ${r.win===1?"w":""}" style="width:${Math.round(r.share*100)}%"></i><i class="bb ${r.win===2?"w":""}" style="width:${100-Math.round(r.share*100)}%"></i></div>
-  <div class="dv r ${r.win===2?"w":""}">${r.fb}</div></div>`).join("")}</div>
- <p class="note">La barra muestra qué tan lejos está uno del otro: cuanto más larga la parte de un auto, mejor le va en esa categoría. Menos de 3% de diferencia cuenta como empate. Costo de uso: 15.000 km por año, 80% cargando en casa en horario valle, con mantenimiento y patente.</p></div>
- <div class="panel"><h3>Otros datos</h3><div class="scroll"><table>
-  <tr><th></th><th>${A.md}</th><th>${B.md}</th></tr>
-  <tr><td>Autonomía declarada</td><td>${A.dec?A.dec+" km "+A.cyc:"—"}</td><td>${B.dec?B.dec+" km "+B.cyc:"—"}</td></tr>
-  <tr><td>Conector</td><td>${A.conn}</td><td>${B.conn}</td></tr>
-  <tr><td>Carga en casa 0–100%</td><td>${A.acH?A.acH+" h":"—"}</td><td>${B.acH?B.acH+" h":"—"}</td></tr>
-  <tr><td>Service</td><td>${A.post.int?"cada "+A.post.int.toLocaleString("es-UY")+" km":"sin fijo"}</td><td>${B.post.int?"cada "+B.post.int.toLocaleString("es-UY")+" km":"sin fijo"}</td></tr>
-  <tr><td>Garantía</td><td style="font-size:.8rem">${WARR[A.mk]||"—"}</td><td style="font-size:.8rem">${WARR[B.mk]||"—"}</td></tr>
-  <tr><td>Origen de datos de carga</td><td>${srcTag(A)}</td><td>${srcTag(B)}</td></tr></table></div></div>`;
+  <div class="panel"><h3>Por qué elegir el ${A.md}<\/h3>${pa.length?`<ul class="plist">${pa.map(p=>li(p,"pa")).join("")}<\/ul>`:'<p>No supera al otro en ninguna categoría.<\/p>'}<\/div>
+  <div class="panel"><h3>Por qué elegir el ${B.md}<\/h3>${pb.length?`<ul class="plist">${pb.map(p=>li(p,"pb")).join("")}<\/ul>`:'<p>No supera al otro en ninguna categoría.<\/p>'}<\/div>
+ <\/div>
+ <div class="panel"><h2>Categoría por categoría<\/h2>
+ <div class="duels">${R.map(r=>`<div class="duel"><div class="dl">${r.lab}${r.tie?' <span class="tie">empate<\/span>':""}<\/div>
+  <div class="dv ${r.win===1?"w":""}">${r.fa}<\/div>
+  <div class="db" role="img" aria-label="${r.lab}: ${r.fa} contra ${r.fb}"><i class="ba ${r.win===1?"w":""}" style="width:${Math.round(r.share*100)}%"><\/i><i class="bb ${r.win===2?"w":""}" style="width:${100-Math.round(r.share*100)}%"><\/i><\/div>
+  <div class="dv r ${r.win===2?"w":""}">${r.fb}<\/div><\/div>`).join("")}<\/div>
+ <p class="note">La barra muestra qué tan lejos está uno del otro: cuanto más larga la parte de un auto, mejor le va en esa categoría. Menos de 3% de diferencia cuenta como empate. Costo de uso: 15.000 km por año, 80% cargando en casa en horario valle, con mantenimiento y patente.<\/p><\/div>
+ <div class="panel"><h3>Otros datos<\/h3><div class="scroll"><table>
+  <tr><th><\/th><th>${A.md}<\/th><th>${B.md}<\/th><\/tr>
+  <tr><td>Autonomía declarada<\/td><td>${A.dec?A.dec+" km "+A.cyc:"—"}<\/td><td>${B.dec?B.dec+" km "+B.cyc:"—"}<\/td><\/tr>
+  <tr><td>Conector<\/td><td>${A.conn}<\/td><td>${B.conn}<\/td><\/tr>
+  <tr><td>Carga en casa 0–100%<\/td><td>${A.acH?A.acH+" h":"—"}<\/td><td>${B.acH?B.acH+" h":"—"}<\/td><\/tr>
+  <tr><td>Service<\/td><td>${A.post.int?"cada "+A.post.int.toLocaleString("es-UY")+" km":"sin fijo"}<\/td><td>${B.post.int?"cada "+B.post.int.toLocaleString("es-UY")+" km":"sin fijo"}<\/td><\/tr>
+  <tr><td>Garantía<\/td><td style="font-size:.8rem">${WARR[A.mk]||"—"}<\/td><td style="font-size:.8rem">${WARR[B.mk]||"—"}<\/td><\/tr>
+  <tr><td>Origen de datos de carga<\/td><td>${srcTag(A)}<\/td><td>${srcTag(B)}<\/td><\/tr><\/table><\/div><\/div>`;
  $("#vsBody").querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>openCar(+b.dataset.open));
  $("#vsBody").querySelectorAll("[data-quote]").forEach(b=>b.onclick=()=>quoteForm(CARS[+b.dataset.quote]))}
 
-const opts=[...CARS].sort((a,b)=>label(a).localeCompare(label(b))).map(c=>`<option value="${c.id}">${label(c)} · ${fmtU(c.price)}</option>`).join("");
+const opts=[...CARS].sort((a,b)=>label(a).localeCompare(label(b))).map(c=>`<option value="${c.id}">${label(c)} · ${fmtU(c.price)}<\/option>`).join("");
 $("#cCar").innerHTML=opts;$("#tCar").innerHTML=opts;$("#vsA").innerHTML=opts;$("#vsB").innerHTML=opts;
 $("#vsA").onchange=e=>{vs[0]=+e.target.value;renderCmp()};$("#vsB").onchange=e=>{vs[1]=+e.target.value;renderCmp()};
 $("#vsSwap").onclick=()=>{vs=[vs[1],vs[0]];renderCmp()};
@@ -1182,34 +1183,34 @@ const pc=$("#vsPairs");PAIRS.forEach(([m1,d1,m2,d2])=>{const a=findC(m1,d1),b=fi
 function calc(){const c=CARS[+$("#cCar").value];const km=+$("#cKm").value,home=+$("#cHome").value/100,tar=+$("#cTar").value,L=+$("#cL").value,naf=+$("#cNafta").value||0,usd=+$("#cUsd").value||40;
  $("#cKmO").textContent=km.toLocaleString("es-UY")+" km";$("#cHomeO").textContent=Math.round(home*100)+"%";$("#cLO").textContent=L+" L";
  const kwh=km*c.eff/100*1.1;const pub=11.8+132.9/30;const en=energyMonth(c,km,home,tar,naf);const ev=en.elec+en.fuel;const ice=km*L/100*naf;const save=ice-ev;const hyb=c.type!=="E";
- $("#cOut").innerHTML=`<div class="grid2"><div class="kv"><span>${hyb?"Este híbrido":"Eléctrico"} / mes</span><b>${fmtP(ev)}</b>${hyb?`<small>${fmtP(en.elec)} de luz + ${fmtP(en.fuel)} de nafta</small>`:""}</div><div class="kv"><span>Nafta (${L} L/100 km) / mes</span><b>${fmtP(ice)}</b></div></div>
- <div class="save"><div class="kv"><span style="color:inherit">Ahorrás por mes</span><b class="big" style="font-size:1.8rem">${fmtP(save)}</b></div><div class="num" style="font-size:.9rem">${fmtP(save*12)} por año · ${fmtU(Math.round(save*60/usd))} en 5 años</div></div>
- <p>${hyb?`${label(c)}: con carga diaria, ${Math.round(en.f*100)}% de los km van con batería (${c.rng} km reales por carga) y el resto a nafta (~${c.lcs.toLocaleString("es-UY")} L/100 km).`:`${label(c)}: ${Math.round(kwh)} kWh al mes (incluye ~10% de pérdidas al cargar).`} La carga pública se calcula en rápida UTE, con la bajada de bandera prorrateada en sesiones de 30 kWh: $${pub.toFixed(2).replace(".",",")}/kWh.</p>
- <p class="note">Solo energía. Abajo, el costo total con mantenimiento y patente.</p>`;
+ $("#cOut").innerHTML=`<div class="grid2"><div class="kv"><span>${hyb?"Este híbrido":"Eléctrico"} / mes<\/span><b>${fmtP(ev)}<\/b>${hyb?`<small>${fmtP(en.elec)} de luz + ${fmtP(en.fuel)} de nafta<\/small>`:""}<\/div><div class="kv"><span>Nafta (${L} L/100 km) / mes<\/span><b>${fmtP(ice)}<\/b><\/div><\/div>
+ <div class="save"><div class="kv"><span style="color:inherit">Ahorrás por mes<\/span><b class="big" style="font-size:1.8rem">${fmtP(save)}<\/b><\/div><div class="num" style="font-size:.9rem">${fmtP(save*12)} por año · ${fmtU(Math.round(save*60/usd))} en 5 años<\/div><\/div>
+ <p>${hyb?`${label(c)}: con carga diaria, ${Math.round(en.f*100)}% de los km van con batería (${c.rng} km reales por carga) y el resto a nafta (~${c.lcs.toLocaleString("es-UY")} L/100 km).`:`${label(c)}: ${Math.round(kwh)} kWh al mes (incluye ~10% de pérdidas al cargar).`} La carga pública se calcula en rápida UTE, con la bajada de bandera prorrateada en sesiones de 30 kWh: $${pub.toFixed(2).replace(".",",")}/kWh.<\/p>
+ <p class="note">Solo energía. Abajo, el costo total con mantenimiento y patente.<\/p>`;
  // costo total 5 años
  const Y=5,kmY=km*12,iceP=+$("#cIce").value||c.price;const m=hyb?maintHyb(c,kmY,Y):maint(c,kmY,Y),mi=maintICE(c,kmY,Y);
  const eE=ev*12*Y/usd,eI=ice*12*Y/usd,pE=patente(c.price,Y,c.patR),pI=patente(iceP,Y,.05);
  const rows=[[hyb?"Luz y nafta":"Energía",eE,eI],["Services",m.svc,mi.svc],["Cubiertas",m.tires,mi.tires],["Frenos",m.brakes,mi.brakes],["Batería 12 V",m.b12,mi.b12],[`Patente (${hyb?"5%":"3%"} vs 5%)`,pE,pI],["Seguro todo riesgo (estimado)",insurance(c.price,Y),insurance(iceP,Y)]];
  const tE=rows.reduce((a,r)=>a+r[1],0),tI=rows.reduce((a,r)=>a+r[2],0);const mx=Math.max(tE,tI);
- const bar=(v,col)=>`<div class="track" style="height:14px;background:var(--sunk);border-radius:7px;overflow:hidden"><i style="display:block;height:100%;width:${Math.round(v/mx*100)}%;background:${col};border-radius:7px"></i></div>`;
- $("#tcoOut").innerHTML=`<h2>Costo de uso en 5 años</h2><p>${(kmY*Y).toLocaleString("es-UY")} km en total. Sin contar el precio de compra.</p>
- <div class="curve"><div class="lane" style="grid-template-columns:80px 1fr 92px"><span>${hyb?"Híbrido":"Eléctrico"}</span>${bar(tE,"var(--accent)")}<b>${fmtU(Math.round(tE))}</b></div>
- <div class="lane" style="grid-template-columns:80px 1fr 92px"><span>Nafta ${L} L</span>${bar(tI,"var(--sol)")}<b>${fmtU(Math.round(tI))}</b></div></div>
- <div class="scroll"><table><tr><th></th><th style="text-align:right">${hyb?"Este híbrido":"Eléctrico"}</th><th style="text-align:right">Nafta (${L} L/100 km)</th></tr>
- ${rows.map(r=>`<tr><td>${r[0]}</td><td class="n">${fmtU(Math.round(r[1]))}</td><td class="n">${fmtU(Math.round(r[2]))}</td></tr>`).join("")}
- <tr><td><b>Total</b></td><td class="n best">${fmtU(Math.round(tE))}</td><td class="n"><b>${fmtU(Math.round(tI))}</b></td></tr></table></div>
- <div class="save"><b>Diferencia en 5 años: ${fmtU(Math.round(tI-tE))}</b></div>
- <p class="note">Service a nafta: ~$16.500 cada 10.000 km (rango oficial $15.000–18.000). Patente sobre el valor sin IVA, bajando ~10% por año. Seguro: estimado de todo riesgo para Montevideo (~3,2–4% del valor por año, según precio), igual para los dos autos. Las primas varían mucho según aseguradora, zona y conductor: dueños de BYD reportan cotizaciones anuales de $24.000 a $88.000, y el BSE da 15% de descuento a eléctricos. Cotizá con 2 o 3 aseguradoras.</p>`}
+ const bar=(v,col)=>`<div class="track" style="height:14px;background:var(--sunk);border-radius:7px;overflow:hidden"><i style="display:block;height:100%;width:${Math.round(v/mx*100)}%;background:${col};border-radius:7px"><\/i><\/div>`;
+ $("#tcoOut").innerHTML=`<h2>Costo de uso en 5 años<\/h2><p>${(kmY*Y).toLocaleString("es-UY")} km en total. Sin contar el precio de compra.<\/p>
+ <div class="curve"><div class="lane" style="grid-template-columns:80px 1fr 92px"><span>${hyb?"Híbrido":"Eléctrico"}<\/span>${bar(tE,"var(--accent)")}<b>${fmtU(Math.round(tE))}<\/b><\/div>
+ <div class="lane" style="grid-template-columns:80px 1fr 92px"><span>Nafta ${L} L<\/span>${bar(tI,"var(--sol)")}<b>${fmtU(Math.round(tI))}<\/b><\/div><\/div>
+ <div class="scroll"><table><tr><th><\/th><th style="text-align:right">${hyb?"Este híbrido":"Eléctrico"}<\/th><th style="text-align:right">Nafta (${L} L/100 km)<\/th><\/tr>
+ ${rows.map(r=>`<tr><td>${r[0]}<\/td><td class="n">${fmtU(Math.round(r[1]))}<\/td><td class="n">${fmtU(Math.round(r[2]))}<\/td><\/tr>`).join("")}
+ <tr><td><b>Total<\/b><\/td><td class="n best">${fmtU(Math.round(tE))}<\/td><td class="n"><b>${fmtU(Math.round(tI))}<\/b><\/td><\/tr><\/table><\/div>
+ <div class="save"><b>Diferencia en 5 años: ${fmtU(Math.round(tI-tE))}<\/b><\/div>
+ <p class="note">Service a nafta: ~$16.500 cada 10.000 km (rango oficial $15.000–18.000). Patente sobre el valor sin IVA, bajando ~10% por año. Seguro: estimado de todo riesgo para Montevideo (~3,2–4% del valor por año, según precio), igual para los dos autos. Las primas varían mucho según aseguradora, zona y conductor: dueños de BYD reportan cotizaciones anuales de $24.000 a $88.000, y el BSE da 15% de descuento a eléctricos. Cotizá con 2 o 3 aseguradoras.<\/p>`}
 
 // viaje
 // ciudades: [nombre, lat, lon, km desde Montevideo por ruta (si se conoce)]
 const CITY=[["Montevideo",-34.9058,-56.1913,0],["Artigas",-30.4,-56.4667,600],["Atlántida",-34.772,-55.7586,45],["Bella Unión",-30.2591,-57.6003,630],["Canelones",-34.5228,-56.2778,46],["Carmelo",-34.0,-58.2833,250],["Chuy",-33.6971,-53.4616,340],["Colonia del Sacramento",-34.471,-57.844,177],["Durazno",-33.3806,-56.5236,183],["Florida",-34.0956,-56.2142,97],["Fray Bentos",-33.1325,-58.2956,310],["La Paloma",-34.6627,-54.1636,245],["Maldonado",-34.9,-54.95,135],["Melo",-32.3667,-54.1667,390],["Mercedes",-33.2524,-58.0305,280],["Minas",-34.3759,-55.2377,120],["Nueva Palmira",-33.88,-58.41,270],["Paysandú",-32.3214,-58.0756,375],["Piriápolis",-34.8667,-55.2747,98],["Punta del Diablo",-34.0444,-53.5444,300],["Punta del Este",-34.962,-54.945,130],["Río Branco",-32.5973,-53.3854,420],["Rivera",-30.9053,-55.5508,500],["Rocha",-34.4833,-54.3333,210],["Salto",-31.3833,-57.9667,495],["San José de Mayo",-34.3375,-56.7136,95],["Tacuarembó",-31.7333,-55.9833,390],["Treinta y Tres",-33.2333,-54.3833,285],["Trinidad",-33.5165,-56.8996,190],["Young",-32.7,-57.6333,310]];
 const hav=(a,b,c,d)=>{const r=Math.PI/180,x=Math.sin((c-a)*r/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin((d-b)*r/2)**2;return 12742*Math.asin(Math.sqrt(x))};
 function roadKm(i,j){const A=CITY[i],B=CITY[j];if(i===0)return B[3];if(j===0)return A[3];return Math.round(hav(A[1],A[2],B[1],B[2])*1.22/5)*5}
-const cOpt=sel=>CITY.map((c,i)=>`<option value="${i}"${i===sel?" selected":""}>${c[0]}</option>`).join("");
+const cOpt=sel=>CITY.map((c,i)=>`<option value="${i}"${i===sel?" selected":""}>${c[0]}<\/option>`).join("");
 $("#tOrig").innerHTML=cOpt(0);
 function fillDest(){const o=+$("#tOrig").value;const cur=+$("#tDest").value;const L=CITY.map((c,i)=>[c,i]).filter(([c,i])=>i!==o).sort((a,b)=>roadKm(o,a[1])-roadKm(o,b[1]));
- $("#tDest").innerHTML=L.map(([c,i])=>`<option value="${i}">${c[0]} · ~${roadKm(o,i)} km</option>`).join("");if(cur!==o&&L.some(([c,i])=>i===cur))$("#tDest").value=cur}
+ $("#tDest").innerHTML=L.map(([c,i])=>`<option value="${i}">${c[0]} · ~${roadKm(o,i)} km<\/option>`).join("");if(cur!==o&&L.some(([c,i])=>i===cur))$("#tDest").value=cur}
 $("#tDest").innerHTML="";fillDest();$("#tDest").value=20;
 $("#tOrig").addEventListener("input",()=>{fillDest();trip()});
 ["tCar","tDest","tKw","tRt"].forEach(id=>$("#"+id).addEventListener("input",trip));
@@ -1230,39 +1231,39 @@ function tripMap(oI,dI,plan,outN,rt){const O={la:CITY[oI][1],lo:CITY[oI][2]},D={
  let w=Math.max(x1-x0,160)+90,h=Math.max(y1-y0,0)+90;if(h<w*.62)h=w*.62;if(w<h*.9)w=h*.9;const cx=(x0+x1)/2,cy=(y0+y1)/2;const vb=[cx-w/2,cy-h/2,w,h];
  const k=w/360,f=n=>n.toFixed(1),line=a=>a.map(p=>proj(p.la,p.lo)).map(([x,y])=>f(x)+","+f(y)).join(" ");
  const dots=ST.filter(s=>s.dc>=30).map(s=>{const[x,y]=proj(s.la,s.lo);return x>vb[0]&&x<vb[0]+w&&y>vb[1]&&y<vb[1]+h?`<circle cx="${f(x)}" cy="${f(y)}" r="${f(2.2*k)}" fill="var(--muted)" opacity=".45"/>`:""}).join("");
- const stop=(st,n)=>{const[x,y]=proj(st.la,st.lo);return`<g><circle cx="${f(x)}" cy="${f(y)}" r="${f(9*k)}" fill="var(--sol)" stroke="var(--bg)" stroke-width="${f(2*k)}"/><text x="${f(x)}" y="${f(y+3.6*k)}" text-anchor="middle" font-size="${f(10*k)}" font-weight="700" fill="var(--accent-ink)" font-family="var(--mono)">${n}</text></g>`};
- const city=(p,n,anchor)=>{const[x,y]=proj(p.la,p.lo);return`<circle cx="${f(x)}" cy="${f(y)}" r="${f(7*k)}" fill="var(--accent)" stroke="var(--bg)" stroke-width="${f(2.5*k)}"/><text x="${f(x)}" y="${f(y-12*k)}" text-anchor="middle" font-size="${f(12*k)}" font-weight="600" fill="var(--fg)" stroke="var(--bg)" stroke-width="${f(3*k)}" paint-order="stroke">${n}</text>`};
+ const stop=(st,n)=>{const[x,y]=proj(st.la,st.lo);return`<g><circle cx="${f(x)}" cy="${f(y)}" r="${f(9*k)}" fill="var(--sol)" stroke="var(--bg)" stroke-width="${f(2*k)}"/><text x="${f(x)}" y="${f(y+3.6*k)}" text-anchor="middle" font-size="${f(10*k)}" font-weight="700" fill="var(--accent-ink)" font-family="var(--mono)">${n}<\/text><\/g>`};
+ const city=(p,n,anchor)=>{const[x,y]=proj(p.la,p.lo);return`<circle cx="${f(x)}" cy="${f(y)}" r="${f(7*k)}" fill="var(--accent)" stroke="var(--bg)" stroke-width="${f(2.5*k)}"/><text x="${f(x)}" y="${f(y-12*k)}" text-anchor="middle" font-size="${f(12*k)}" font-weight="600" fill="var(--fg)" stroke="var(--bg)" stroke-width="${f(3*k)}" paint-order="stroke">${n}<\/text>`};
  return`<svg class="tmap" viewBox="${vb.map(f).join(" ")}" role="img" aria-label="Mapa del viaje de ${CITY[oI][0]} a ${CITY[dI][0]} con ${plan.length} paradas">
  ${MAP.deps.map(d=>`<path d="${d.d}" fill="var(--land)" stroke="var(--line)" stroke-width="${f(1.2*k)}"/>`).join("")}${dots}
  ${rt?`<polyline points="${line(back)}" fill="none" stroke="var(--sol)" stroke-width="${f(3*k)}" stroke-dasharray="${f(6*k)} ${f(5*k)}" stroke-linecap="round" stroke-linejoin="round"/>`:""}
  <polyline points="${line(go)}" fill="none" stroke="var(--accent)" stroke-width="${f(4*k)}" stroke-linecap="round" stroke-linejoin="round"/>
- ${plan.map((p,i)=>stop(p.st,i+1)).join("")}${city(O,CITY[oI][0])}${oI!==dI?city(D,CITY[dI][0]):""}</svg>
- <div class="glg" style="margin-top:0"><span><i style="background:var(--accent)"></i>Ida</span>${rt?`<span><i style="background:var(--sol)"></i>Vuelta</span>`:""}<span><i style="background:var(--muted);opacity:.6"></i>Cargadores rápidos UTE</span><span>Trazado aproximado</span></div>`}
+ ${plan.map((p,i)=>stop(p.st,i+1)).join("")}${city(O,CITY[oI][0])}${oI!==dI?city(D,CITY[dI][0]):""}<\/svg>
+ <div class="glg" style="margin-top:0"><span><i style="background:var(--accent)"><\/i>Ida<\/span>${rt?`<span><i style="background:var(--sol)"><\/i>Vuelta<\/span>`:""}<span><i style="background:var(--muted);opacity:.6"><\/i>Cargadores rápidos UTE<\/span><span>Trazado aproximado<\/span><\/div>`}
 function trip(){const c=CARS[+$("#tCar").value];const oI=+$("#tOrig").value,dI=+$("#tDest").value;const on=CITY[oI][0],dn=CITY[dI][0],d0=roadKm(oI,dI);const rt=+$("#tRt").value;const d=d0*(rt?2:1);const kw=+$("#tKw").value;
  if(c.type!=="E"){const evKm=Math.min(d,c.hw);const fuelKm=d-evKm;const lt=fuelKm*c.lcs*1.1/100;const cost=lt*90.45;
-  $("#tOut").innerHTML=`<div class="big" style="color:var(--good)">Llegás sin paradas</div>${tripMap(oI,dI,[],0,rt)}
-  <div class="grid2"><div class="kv"><span>Distancia</span><b>~${d} km</b></div><div class="kv"><span>Con batería</span><b>~${Math.round(evKm)} km</b></div><div class="kv"><span>A nafta</span><b>~${Math.round(fuelKm)} km</b><small>~${Math.round(lt)} litros</small></div><div class="kv"><span>Nafta del viaje</span><b>${fmtP(cost)}</b></div></div>
-  <p>${label(c)} sale con la batería llena, usa ~${c.hw} km eléctricos en ruta y sigue a nafta. Si cargás en destino, la vuelta arranca otra vez en eléctrico.</p>
-  <p class="note">Consumo a nafta en ruta estimado en ${(c.lcs*1.1).toFixed(1).replace(".",",")} L/100 km con batería descargada. Súper 95 a $90,45.</p>`;return}
+  $("#tOut").innerHTML=`<div class="big" style="color:var(--good)">Llegás sin paradas<\/div>${tripMap(oI,dI,[],0,rt)}
+  <div class="grid2"><div class="kv"><span>Distancia<\/span><b>~${d} km<\/b><\/div><div class="kv"><span>Con batería<\/span><b>~${Math.round(evKm)} km<\/b><\/div><div class="kv"><span>A nafta<\/span><b>~${Math.round(fuelKm)} km<\/b><small>~${Math.round(lt)} litros<\/small><\/div><div class="kv"><span>Nafta del viaje<\/span><b>${fmtP(cost)}<\/b><\/div><\/div>
+  <p>${label(c)} sale con la batería llena, usa ~${c.hw} km eléctricos en ruta y sigue a nafta. Si cargás en destino, la vuelta arranca otra vez en eléctrico.<\/p>
+  <p class="note">Consumo a nafta en ruta estimado en ${(c.lcs*1.1).toFixed(1).replace(".",",")} L/100 km con batería descargada. Súper 95 a $90,45.<\/p>`;return}
  const per=c.eff*1.22/100;const first=c.usable*.9/per;const leg=c.usable*.7/per;
  const A=[CITY[oI][1],CITY[oI][2]],B=[CITY[dI][1],CITY[dI][2]];
  const attempt=L=>{const pl=[];let r=planLeg(A,B,first,L,pl);const o=pl.length;if(r!==null&&rt)r=planLeg(B,A,r,L,pl);return{pl,r,o}};
  let at=attempt(leg),hi=false;if(at.r===null&&c.dc){const a2=attempt(c.usable*.85/per);if(a2.r!==null){at=a2;hi=true}}
  const plan=at.pl,outN=at.o;let rem=at.r;
  const mins=dcMin(c,kw);
- if(rem===null||(plan.length&&!c.dc)){$("#tOut").innerHTML=`<div class="big" style="color:var(--bad)">No llega</div><p>${!c.dc?`${label(c)} no tiene carga rápida y su alcance en ruta es de ~${Math.round(first)} km: para este viaje tendrías que parar varias horas en un punto lento.`:`Con ${label(c)} (alcance en ruta ~${Math.round(first)} km) no encontramos una cadena de cargadores rápidos de UTE que llegue de ${on} a ${dn}${rt?" y vuelva":""}. Probá con un auto de más autonomía o cargando en un punto lento por el camino.`}</p>`;return}
+ if(rem===null||(plan.length&&!c.dc)){$("#tOut").innerHTML=`<div class="big" style="color:var(--bad)">No llega<\/div><p>${!c.dc?`${label(c)} no tiene carga rápida y su alcance en ruta es de ~${Math.round(first)} km: para este viaje tendrías que parar varias horas en un punto lento.`:`Con ${label(c)} (alcance en ruta ~${Math.round(first)} km) no encontramos una cadena de cargadores rápidos de UTE que llegue de ${on} a ${dn}${rt?" y vuelva":""}. Probá con un auto de más autonomía o cargando en un punto lento por el camino.`}<\/p>`;return}
  const stops=plan.length;const energy=d*per;const pubE=Math.max(0,energy-c.usable*.9);const cost=pubE*11.8+stops*132.9;
- const legs=[`<div class="leg"><i></i><span>Salís de ${on} al 100%</span></div>`];let acc=0;plan.forEach((p,k)=>{acc+=p.km;if(k===outN&&rt)legs.push(`<div class="leg"><i></i><span>Llegás a ${dn} y emprendés la vuelta</span></div>`);
-  legs.push(`<div class="leg"><i class="c n">${k+1}</i><span>Parada ${k+1}: <b>${p.st.name}</b> (${p.st.city}, ${p.st.dc} kW) · ~${mins} min hasta 80%<br><small>${p.st.addr} · ~${Math.round(p.km)} km desde ${k===0?on:(rt&&k===outN)?dn:"la parada anterior"}</small></span></div>`)});
- if(rt&&outN===plan.length)legs.push(`<div class="leg"><i></i><span>Llegás a ${dn} y emprendés la vuelta</span></div>`);
- legs.push(`<div class="leg"><i></i><span>Llegás a ${rt?on:dn}</span></div>`);
- const hiN=hi?`<p class="note"><b>Ojo:</b> en algún tramo no alcanza con cargar hasta 80%: tenés que cargar hasta ~95% en esa parada. Arriba del 80% la carga es más lenta, así que sumá 15–25 minutos.</p>`:"";
- const cap=c.dc&&c.dc<kw?`<p class="note">El auto carga a ${c.dc} kW como máximo, así que un cargador más potente no lo acelera.</p>`:"";
- $("#tOut").innerHTML=`<div class="big" style="color:${stops?"var(--warn)":"var(--good)"}">${stops?stops+(stops>1?" paradas":" parada"):"Llegás sin cargar"}</div>${tripMap(oI,dI,plan,outN,rt)}
- <div class="grid2"><div class="kv"><span>Distancia</span><b>~${d} km</b></div><div class="kv"><span>Alcance en ruta (100→10%)</span><b>${Math.round(first)} km</b></div><div class="kv"><span>Tiempo cargando</span><b>${stops*mins} min</b></div><div class="kv"><span>Costo en cargadores UTE</span><b>${fmtP(cost)}</b></div></div>
- <div class="legs">${legs.join("")}</div>${hiN}${cap}
- <button class="btn ghost" id="tShare">Compartir el plan</button>
- <p class="note">Distancias aproximadas por ruta (entre ciudades del interior se estiman desde la distancia en línea recta). Las paradas son cargadores rápidos reales de UTE elegidos para avanzar lo más posible en cada tramo. Con frío, lluvia o aire acondicionado al máximo, contá con 10–20% menos de alcance. Antes de salir, revisá en UTE Mueve que el cargador de cada parada esté operativo.</p>`;
+ const legs=[`<div class="leg"><i><\/i><span>Salís de ${on} al 100%<\/span><\/div>`];let acc=0;plan.forEach((p,k)=>{acc+=p.km;if(k===outN&&rt)legs.push(`<div class="leg"><i><\/i><span>Llegás a ${dn} y emprendés la vuelta<\/span><\/div>`);
+  legs.push(`<div class="leg"><i class="c n">${k+1}<\/i><span>Parada ${k+1}: <b>${p.st.name}<\/b> (${p.st.city}, ${p.st.dc} kW) · ~${mins} min hasta 80%<br><small>${p.st.addr} · ~${Math.round(p.km)} km desde ${k===0?on:(rt&&k===outN)?dn:"la parada anterior"}<\/small><\/span><\/div>`)});
+ if(rt&&outN===plan.length)legs.push(`<div class="leg"><i><\/i><span>Llegás a ${dn} y emprendés la vuelta<\/span><\/div>`);
+ legs.push(`<div class="leg"><i><\/i><span>Llegás a ${rt?on:dn}<\/span><\/div>`);
+ const hiN=hi?`<p class="note"><b>Ojo:<\/b> en algún tramo no alcanza con cargar hasta 80%: tenés que cargar hasta ~95% en esa parada. Arriba del 80% la carga es más lenta, así que sumá 15–25 minutos.<\/p>`:"";
+ const cap=c.dc&&c.dc<kw?`<p class="note">El auto carga a ${c.dc} kW como máximo, así que un cargador más potente no lo acelera.<\/p>`:"";
+ $("#tOut").innerHTML=`<div class="big" style="color:${stops?"var(--warn)":"var(--good)"}">${stops?stops+(stops>1?" paradas":" parada"):"Llegás sin cargar"}<\/div>${tripMap(oI,dI,plan,outN,rt)}
+ <div class="grid2"><div class="kv"><span>Distancia<\/span><b>~${d} km<\/b><\/div><div class="kv"><span>Alcance en ruta (100→10%)<\/span><b>${Math.round(first)} km<\/b><\/div><div class="kv"><span>Tiempo cargando<\/span><b>${stops*mins} min<\/b><\/div><div class="kv"><span>Costo en cargadores UTE<\/span><b>${fmtP(cost)}<\/b><\/div><\/div>
+ <div class="legs">${legs.join("")}<\/div>${hiN}${cap}
+ <button class="btn ghost" id="tShare">Compartir el plan<\/button>
+ <p class="note">Distancias aproximadas por ruta (entre ciudades del interior se estiman desde la distancia en línea recta). Las paradas son cargadores rápidos reales de UTE elegidos para avanzar lo más posible en cada tramo. Con frío, lluvia o aire acondicionado al máximo, contá con 10–20% menos de alcance. Antes de salir, revisá en UTE Mueve que el cargador de cada parada esté operativo.<\/p>`;
  $("#tShare").onclick=()=>shareWA(`${on} → ${dn}${rt?" y vuelta":""} con ${c.mk} ${c.md} (~${d} km): ${stops?`${stops} ${stops>1?"paradas":"parada"} de carga: ${plan.map((p,k)=>`${k+1}) ${p.st.name}, ${p.st.city}`).join("; ")}`:"sin paradas de carga"}. Plan armado con Kilowá.`)}
 
 // mapa
@@ -1274,7 +1275,7 @@ const MK=Math.cos(-32.5*Math.PI/180),MS=600/(5.5*MK);const proj=(la,lo)=>[(lo+58
 const TL={f:"Carga rápida 60 kW",m:"Carga rápida 20–30 kW",a:"Solo carga lenta (AC)"};
 const stSum=(f)=>ST.reduce((a,s)=>a+s.con.filter(f).reduce((b,c)=>b+c.n,0),0);
 const STAT={st:ST.length,con:stSum(()=>1),dc:stSum(c=>c.t!=="Tipo 2"),ac:stSum(c=>c.t==="Tipo 2"),f:ST.filter(s=>s.cls==="f").length,loc:new Set(ST.map(s=>s.city.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,""))).size,gbt:stSum(c=>c.t==="GB/T")};
-$("#mStats").innerHTML=[["Estaciones",STAT.st],["Conectores",STAT.con],["Rápidos DC",STAT.dc],["Lentos AC",STAT.ac]].map(([k,v])=>`<div class="kv"><span>${k}</span><b>${v}</b></div>`).join("");
+$("#mStats").innerHTML=[["Estaciones",STAT.st],["Conectores",STAT.con],["Rápidos DC",STAT.dc],["Lentos AC",STAT.ac]].map(([k,v])=>`<div class="kv"><span>${k}<\/span><b>${v}<\/b><\/div>`).join("");
 $("#mIntro").textContent=`${STAT.st} estaciones de la red pública de UTE en ${STAT.loc} localidades de los 19 departamentos: ${STAT.f} con carga rápida de 60 kW. ${STAT.gbt} conectores GB/T. Ubicación exacta de cada estación.`;
 document.querySelectorAll(".uteTot").forEach(e=>e.textContent=`${STAT.st} estaciones y ${STAT.con} conectores en ${STAT.loc} localidades (${STAT.dc} de carga rápida DC)`);
 let mapF="all",selSt=null,selDep=null,mapDrawn=false,near=null;
@@ -1287,24 +1288,24 @@ function drawMap(){if(mapDrawn)return;mapDrawn=true;const svg=$("#map");const vb
  svg.setAttribute("viewBox",vb.map(v=>v.toFixed(1)).join(" "));
  const vis=ST.filter(mfOk).sort((a,b)=>"amf".indexOf(a.cls)-"amf".indexOf(b.cls));
  const R={f:6,m:5,a:4};
- svg.innerHTML=MAP.deps.map(d=>`<path class="dep${d.n===selDep?" sel":""}" data-d="${d.n}" d="${d.d}" style="stroke-width:${(1.4*z).toFixed(2)}"><title>${d.n}</title></path>`).join("")+
- vis.map(s=>{const [x,y]=proj(s.la,s.lo);return`<g class="pt ${s.cls}${s.i===selSt?" on":""}" data-i="${s.i}" tabindex="0" role="button" aria-label="${s.name}"><circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="${(12*z).toFixed(2)}" fill="transparent"/><circle class="o" cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="${(R[s.cls]*Math.max(z,.16)).toFixed(2)}" style="stroke-width:${(2*Math.max(z,.16)).toFixed(2)}"/></g>`}).join("")+
- (selDep?"":["Montevideo|-34.6|-56.2","Salto|-31.39|-57.96","Rivera|-30.905|-55.55","Paysandú|-32.32|-58.08","Tacuarembó|-31.71|-55.98","Durazno|-33.38|-56.52","Punta del Este|-34.96|-54.94","Rocha|-34.48|-54.33","Colonia|-34.47|-57.84","Melo|-32.37|-54.17","Artigas|-30.40|-56.47","Treinta y Tres|-33.23|-54.38","Mercedes|-33.25|-58.03","Minas|-34.37|-55.23"].map(t=>{const[n,la,lo]=t.split("|");const [x,y]=proj(+la,+lo);const left=x>470;return`<text class="maplbl" x="${(x+(left?-11:11)).toFixed(0)}" y="${(y+(n==="Montevideo"?30:4)).toFixed(0)}" text-anchor="${n==="Montevideo"?"middle":left?"end":"start"}">${n}</text>`}).join(""));
+ svg.innerHTML=MAP.deps.map(d=>`<path class="dep${d.n===selDep?" sel":""}" data-d="${d.n}" d="${d.d}" style="stroke-width:${(1.4*z).toFixed(2)}"><title>${d.n}<\/title><\/path>`).join("")+
+ vis.map(s=>{const [x,y]=proj(s.la,s.lo);return`<g class="pt ${s.cls}${s.i===selSt?" on":""}" data-i="${s.i}" tabindex="0" role="button" aria-label="${s.name}"><circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="${(12*z).toFixed(2)}" fill="transparent"/><circle class="o" cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="${(R[s.cls]*Math.max(z,.16)).toFixed(2)}" style="stroke-width:${(2*Math.max(z,.16)).toFixed(2)}"/><\/g>`}).join("")+
+ (selDep?"":["Montevideo|-34.6|-56.2","Salto|-31.39|-57.96","Rivera|-30.905|-55.55","Paysandú|-32.32|-58.08","Tacuarembó|-31.71|-55.98","Durazno|-33.38|-56.52","Punta del Este|-34.96|-54.94","Rocha|-34.48|-54.33","Colonia|-34.47|-57.84","Melo|-32.37|-54.17","Artigas|-30.40|-56.47","Treinta y Tres|-33.23|-54.38","Mercedes|-33.25|-58.03","Minas|-34.37|-55.23"].map(t=>{const[n,la,lo]=t.split("|");const [x,y]=proj(+la,+lo);const left=x>470;return`<text class="maplbl" x="${(x+(left?-11:11)).toFixed(0)}" y="${(y+(n==="Montevideo"?30:4)).toFixed(0)}" text-anchor="${n==="Montevideo"?"middle":left?"end":"start"}">${n}<\/text>`}).join(""));
  svg.querySelectorAll(".pt").forEach(g=>{const f=()=>pick(+g.dataset.i);g.onclick=e=>{e.stopPropagation();f()};g.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();f()}}});
  svg.querySelectorAll(".dep").forEach(p=>p.onclick=()=>{if(selDep!==p.dataset.d){selDep=p.dataset.d;mapDrawn=false;drawMap()}});
  $("#mapZoom").hidden=!selDep;$("#mapZoom").textContent=selDep?`← Ver todo Uruguay (estás en ${selDep})`:"";
  renderPop();renderLocList()}
 function pick(i,zoom){selSt=i;if(zoom)selDep=ST[i].dep;mapDrawn=false;drawMap()}
-const conTxt=s=>s.con.map(c=>`<span class="cn${c.t==="Tipo 2"?"":" dc"}">${c.n} × ${c.t} ${String(c.kw).replace(".",",")} kW</span>`).join("");
-function renderPop(){const p=$("#mapPop");if(selSt==null){p.innerHTML=`<div class="mk">Tocá un punto</div><p style="margin:0;color:var(--muted);font-size:.88rem">Tocá un departamento para acercarte y un punto para ver la estación: dirección, conectores y potencia.</p>`;return}
+const conTxt=s=>s.con.map(c=>`<span class="cn${c.t==="Tipo 2"?"":" dc"}">${c.n} × ${c.t} ${String(c.kw).replace(".",",")} kW<\/span>`).join("");
+function renderPop(){const p=$("#mapPop");if(selSt==null){p.innerHTML=`<div class="mk">Tocá un punto<\/div><p style="margin:0;color:var(--muted);font-size:.88rem">Tocá un departamento para acercarte y un punto para ver la estación: dirección, conectores y potencia.<\/p>`;return}
  const s=ST[selSt];const fast=s.dc?`Carga DC: bajada de bandera $132,9 + $11,8/kWh`:`Carga AC: bajada de bandera $54,8 + $10,4/kWh`;
- p.innerHTML=`<div class="mk">${s.city} · ${s.dep} · ${TL[s.cls]}</div><h3 style="font-size:1.15rem">${s.name}</h3><p style="margin:0;font-size:.9rem">${s.addr}</p><div class="cns">${conTxt(s)}</div><p class="note" style="margin:0">${fast}. ${s.gbt?"Tiene conector GB/T (autos chinos con toma GB/T). ":""}Disponibilidad en tiempo real en UTE Mueve.</p><a class="chip" style="justify-self:start;text-decoration:none" href="https://www.google.com/maps/dir/?api=1&destination=${s.la},${s.lo}" target="_blank" rel="noopener">Cómo llegar ↗</a>`}
+ p.innerHTML=`<div class="mk">${s.city} · ${s.dep} · ${TL[s.cls]}<\/div><h3 style="font-size:1.15rem">${s.name}<\/h3><p style="margin:0;font-size:.9rem">${s.addr}<\/p><div class="cns">${conTxt(s)}<\/div><p class="note" style="margin:0">${fast}. ${s.gbt?"Tiene conector GB/T (autos chinos con toma GB/T). ":""}Disponibilidad en tiempo real en UTE Mueve.<\/p><a class="chip" style="justify-self:start;text-decoration:none" href="https://www.google.com/maps/dir/?api=1&destination=${s.la},${s.lo}" target="_blank" rel="noopener">Cómo llegar ↗<\/a>`}
 const km=(a,b,c,d)=>{const R=6371,r=Math.PI/180,x=(d-b)*r*Math.cos((a+c)/2*r),y=(c-a)*r;return R*Math.hypot(x,y)};
 function renderLocList(){const L=ST.filter(mfOk);
  if(near){const n=L.map(s=>[s,km(near[0],near[1],s.la,s.lo)]).sort((a,b)=>a[1]-b[1]).slice(0,8);
-  $("#mapList").innerHTML=`<div class="mk" style="margin-top:6px">Las más cercanas a vos</div>`+n.map(([s,d])=>`<button class="loc" data-i="${s.i}"><span>${s.name}<small>${s.city} · ${s.dc?s.dc+" kW DC":"solo AC"}</small></span><span>${d<10?d.toFixed(1).replace(".",","):Math.round(d)} km</span></button>`).join("")}
+  $("#mapList").innerHTML=`<div class="mk" style="margin-top:6px">Las más cercanas a vos<\/div>`+n.map(([s,d])=>`<button class="loc" data-i="${s.i}"><span>${s.name}<small>${s.city} · ${s.dc?s.dc+" kW DC":"solo AC"}<\/small><\/span><span>${d<10?d.toFixed(1).replace(".",","):Math.round(d)} km<\/span><\/button>`).join("")}
  else{const by={};L.forEach(s=>(by[s.dep]=by[s.dep]||[]).push(s));
-  $("#mapList").innerHTML=Object.keys(by).sort((a,b)=>a.localeCompare(b)).map(d=>`<details class="depl"${d===selDep?" open":""}><summary><span>${d}</span><span>${by[d].length} · ${by[d].filter(s=>s.dc).length} rápidas</span></summary>${by[d].sort((a,b)=>a.city.localeCompare(b.city)||b.dc-a.dc).map(s=>`<button class="loc${s.i===selSt?" on":""}" data-i="${s.i}"><span>${s.name}<small>${s.city} · ${s.addr}</small></span><span>${s.dc?s.dc+" kW":"AC"}</span></button>`).join("")}</details>`).join("")}
+  $("#mapList").innerHTML=Object.keys(by).sort((a,b)=>a.localeCompare(b)).map(d=>`<details class="depl"${d===selDep?" open":""}><summary><span>${d}<\/span><span>${by[d].length} · ${by[d].filter(s=>s.dc).length} rápidas<\/span><\/summary>${by[d].sort((a,b)=>a.city.localeCompare(b.city)||b.dc-a.dc).map(s=>`<button class="loc${s.i===selSt?" on":""}" data-i="${s.i}"><span>${s.name}<small>${s.city} · ${s.addr}<\/small><\/span><span>${s.dc?s.dc+" kW":"AC"}<\/span><\/button>`).join("")}<\/details>`).join("")}
  $("#mapList").querySelectorAll(".loc").forEach(b=>b.onclick=()=>{pick(+b.dataset.i,true);$("#map").scrollIntoView({behavior:"smooth",block:"center"})})}
 $("#mapZoom").onclick=()=>{selDep=null;mapDrawn=false;drawMap()};
 $("#mapNear").onclick=()=>{const b=$("#mapNear");if(near){near=null;b.textContent="📍 Más cercanas a mí";renderLocList();return}
@@ -1331,22 +1332,22 @@ function quizRank(a){const best={};CARS.forEach(c=>{if(c.price>a.bud*1.03||!SZ[a
   const k=c.mk+"|"+c.md;if(!best[k]||sc>best[k].sc)best[k]={c,sc,why,warn}});
  return Object.values(best).sort((x,y)=>y.sc-x.sc)}
 function openQuiz(step=0,ans){ans=ans||{};if(step>=QZ.length)return quizResult(ans);const Q=QZ[step];
- $("#sheetCard").innerHTML=`<div class="hd"><div><div class="mk">¿Qué eléctrico me conviene? · ${step+1} de ${QZ.length}</div><h2 style="font-size:1.4rem">${Q.q}</h2></div><button class="x" id="xClose" aria-label="Cerrar">✕</button></div>
- <div class="qprog"><i style="width:${(step+1)/QZ.length*100}%"></i></div>
- <div class="qopts">${Q.o.map(([v,t],i)=>`<button class="qo" data-i="${i}" aria-pressed="${ans[Q.k]===v}">${t}</button>`).join("")}</div>
- ${step?`<button class="lnk" id="qBack">← Volver</button>`:""}`;
+ $("#sheetCard").innerHTML=`<div class="hd"><div><div class="mk">¿Qué eléctrico me conviene? · ${step+1} de ${QZ.length}<\/div><h2 style="font-size:1.4rem">${Q.q}<\/h2><\/div><button class="x" id="xClose" aria-label="Cerrar">✕<\/button><\/div>
+ <div class="qprog"><i style="width:${(step+1)/QZ.length*100}%"><\/i><\/div>
+ <div class="qopts">${Q.o.map(([v,t],i)=>`<button class="qo" data-i="${i}" aria-pressed="${ans[Q.k]===v}">${t}<\/button>`).join("")}<\/div>
+ ${step?`<button class="lnk" id="qBack">← Volver<\/button>`:""}`;
  $("#sheet").hidden=false;$("#sheetCard").scrollTop=0;$("#xClose").onclick=closeSheet;if(step)$("#qBack").onclick=()=>openQuiz(step-1,ans);
  $("#sheetCard").querySelectorAll(".qo").forEach(b=>b.onclick=()=>{ans[Q.k]=Q.o[+b.dataset.i][0];openQuiz(step+1,ans)})}
 function quizResult(a){store.set("voltio.quiz",a);const r=quizRank(a).slice(0,3);
  const tx=v=>QZ.find(q=>q.k===v).o.find(o=>o[0]===a[v])[1];
  const shareTxt=r.length?`Hice el test de Kilowá y me recomienda: ${r.map((x,i)=>`${i+1}. ${x.c.mk} ${x.c.md} (${fmtU(x.c.price)}, ${x.c.rng} km reales)`).join(" · ")}`:"";
- $("#sheetCard").innerHTML=`<div class="hd"><div><div class="mk">Tu resultado</div><h2 style="font-size:1.4rem">${r.length?"Estos son los que mejor te quedan":"No encontramos un auto con esas condiciones"}</h2></div><button class="x" id="xClose" aria-label="Cerrar">✕</button></div>
- <div class="tags">${QZ.map(q=>`<span class="tag">${tx(q.k)}</span>`).join("")}</div>
- ${r.length?r.map((x,i)=>{const c=x.c;return`<div class="panel qr"><div class="row" style="justify-content:space-between;align-items:flex-start;flex-wrap:nowrap"><div><div class="mk">${i===0?"La mejor opción":"Opción "+(i+1)} · ${TYPE[c.type]}</div><h3 style="font-size:1.15rem">${c.mk} ${c.md}</h3><div style="color:var(--muted);font-size:.85rem">${c.vr!=="—"?c.vr:"Versión única"}</div></div><b class="num" style="color:var(--accent);white-space:nowrap">${fmtU(c.price)}</b></div>
-  <ul class="clean qwhy">${x.why.slice(0,3).map(w=>`<li>${w}</li>`).join("")}${x.warn.slice(0,2).map(w=>`<li class="w">${w}</li>`).join("")}</ul>
-  <div class="row" style="gap:8px"><button class="btn ghost" data-open="${c.id}">Ver ficha</button><button class="btn ghost" data-quote="${c.id}">Cotizar</button></div></div>`}).join(""):`<p>Probá subir el presupuesto o elegir otro tamaño.</p>`}
- <p class="note">El orden pesa autonomía para tu uso, carga rápida, red de talleres, precio y km por cada dólar. Es una guía, no un consejo de compra: mirá las fichas y probá los autos antes de decidir.</p>
- <div class="actbar"><button class="btn ghost" id="qAgain">Repetir</button>${r.length?`<button class="btn" id="qShare">Compartir</button>`:`<span></span>`}</div>`;
+ $("#sheetCard").innerHTML=`<div class="hd"><div><div class="mk">Tu resultado<\/div><h2 style="font-size:1.4rem">${r.length?"Estos son los que mejor te quedan":"No encontramos un auto con esas condiciones"}<\/h2><\/div><button class="x" id="xClose" aria-label="Cerrar">✕<\/button><\/div>
+ <div class="tags">${QZ.map(q=>`<span class="tag">${tx(q.k)}<\/span>`).join("")}<\/div>
+ ${r.length?r.map((x,i)=>{const c=x.c;return`<div class="panel qr"><div class="row" style="justify-content:space-between;align-items:flex-start;flex-wrap:nowrap"><div><div class="mk">${i===0?"La mejor opción":"Opción "+(i+1)} · ${TYPE[c.type]}<\/div><h3 style="font-size:1.15rem">${c.mk} ${c.md}<\/h3><div style="color:var(--muted);font-size:.85rem">${c.vr!=="—"?c.vr:"Versión única"}<\/div><\/div><b class="num" style="color:var(--accent);white-space:nowrap">${fmtU(c.price)}<\/b><\/div>
+  <ul class="clean qwhy">${x.why.slice(0,3).map(w=>`<li>${w}<\/li>`).join("")}${x.warn.slice(0,2).map(w=>`<li class="w">${w}<\/li>`).join("")}<\/ul>
+  <div class="row" style="gap:8px"><button class="btn ghost" data-open="${c.id}">Ver ficha<\/button><button class="btn ghost" data-quote="${c.id}">Cotizar<\/button><\/div><\/div>`}).join(""):`<p>Probá subir el presupuesto o elegir otro tamaño.<\/p>`}
+ <p class="note">El orden pesa autonomía para tu uso, carga rápida, red de talleres, precio y km por cada dólar. Es una guía, no un consejo de compra: mirá las fichas y probá los autos antes de decidir.<\/p>
+ <div class="actbar"><button class="btn ghost" id="qAgain">Repetir<\/button>${r.length?`<button class="btn" id="qShare">Compartir<\/button>`:`<span><\/span>`}<\/div>`;
  $("#xClose").onclick=closeSheet;$("#sheetCard").scrollTop=0;$("#qAgain").onclick=()=>openQuiz(0,{});if(r.length)$("#qShare").onclick=()=>shareWA(shareTxt);
  $("#sheetCard").querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>openCar(+b.dataset.open));
  $("#sheetCard").querySelectorAll("[data-quote]").forEach(b=>b.onclick=()=>quoteForm(CARS[+b.dataset.quote],()=>quizResult(a)))}
@@ -1360,10 +1361,10 @@ function shareWA(t){track("compartir");const txt=t+(SHARE_URL?"\n"+SHARE_URL:"")
 function renderHome(){const c=CARS[+$("#cCar").value];if(!c)return;const km=+$("#hKm").value,home=+$("#cHome").value/100,tar=+$("#cTar").value,L=+$("#cL").value,naf=+$("#cNafta").value||0,usd=+$("#cUsd").value||40;
  const en=energyMonth(c,km,home,tar,naf),save=km*L/100*naf-(en.elec+en.fuel);
  $("#hKmO").textContent=km.toLocaleString("es-UY")+" km";$("#hSave").textContent=fmtP(save);
- $("#hNote").innerHTML=`${c.mk} ${c.md} cargando ${Math.round(home*100)}% en casa vs. un auto a nafta de ${String(L).replace(".",",")} L/100 km. <b>${fmtU(Math.round(save*60/usd))} en 5 años.</b> <button class="lnk" data-go="cost">Cambiar auto o tarifa</button>`;
+ $("#hNote").innerHTML=`${c.mk} ${c.md} cargando ${Math.round(home*100)}% en casa vs. un auto a nafta de ${String(L).replace(".",",")} L/100 km. <b>${fmtU(Math.round(save*60/usd))} en 5 años.<\/b> <button class="lnk" data-go="cost">Cambiar auto o tarifa<\/button>`;
  $("#hSt").textContent=ST.length+" estaciones UTE";
  const tops=Object.entries(TOP).sort((a,b)=>a[1]-b[1]).slice(0,5).map(([k,n])=>{const vs=CARS.filter(c=>c.mk+"|"+c.md===k);if(!vs.length)return"";const ch=vs.reduce((a,b)=>b.price<a.price?b:a),mr=Math.max(...vs.map(v=>v.rng));
-  return`<button class="topr" data-open="${ch.id}"><span class="num tn">${n}</span><span class="tm"><b>${ch.mk} ${ch.md}</b><i class="tb"><i style="width:${Math.min(100,Math.round(mr/500*100))}%"></i></i></span><span class="num tp">${vs.length>1?"<small>desde</small> ":""}${fmtU(ch.price)}<small>${mr} km reales</small></span></button>`}).join("");
+  return`<button class="topr" data-open="${ch.id}"><span class="num tn">${n}<\/span><span class="tm"><b>${ch.mk} ${ch.md}<\/b><i class="tb"><i style="width:${Math.min(100,Math.round(mr/500*100))}%"><\/i><\/i><\/span><span class="num tp">${vs.length>1?"<small>desde<\/small> ":""}${fmtU(ch.price)}<small>${mr} km reales<\/small><\/span><\/button>`}).join("");
  $("#hTop").innerHTML=tops;$("#hTop").querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>openCar(+b.dataset.open))}
 $("#hKm").addEventListener("input",()=>{$("#cKm").value=$("#hKm").value;renderHome();calc()});
 $("#cKm").addEventListener("input",()=>{$("#hKm").value=$("#cKm").value;renderHome()});
@@ -1374,6 +1375,19 @@ WATCH=store.get("voltio.watch",{});renderList();if(store.get("voltio.seg","autos
 track("visita");addEventListener("appinstalled",()=>track("instalada"));
 {const p=new URLSearchParams(location.search),v=p.get("v"),a=p.get("auto");if(v&&document.getElementById("v-"+v))show(v);if(a){const c=CARS.find(x=>keyOf(x)===a||label(x)===a);if(c)openCar(c.id)}}
 if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{}));
+</script>
+<script>
+(function(){const OK=/^[0-9.,·\/ ]{3,12}$/,K="kilowa.ovr";let ran=false;
+function run(o){if(ran)return;ran=true;o=o&&typeof o==="object"?o:{};window.OVR=o;let s=document.getElementById("kapp").textContent.replace(/<\\\//g,"</");
+ const R=(Array.isArray(o.rep)?o.rep:[]).filter(p=>Array.isArray(p)&&typeof p[0]==="string"&&typeof p[1]==="string"&&OK.test(p[0])&&OK.test(p[1]));
+ if(R.length){for(const[a,b]of R)s=s.split(a).join(b);
+  const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;while(n=w.nextNode()){if(n.parentNode&&n.parentNode.id==="kapp")continue;let t=n.nodeValue,t0=t;for(const[a,b]of R)t=t.split(a).join(b);if(t!==t0)n.nodeValue=t}
+  document.querySelectorAll("input[value],option[value]").forEach(e=>{let v=e.getAttribute("value");for(const[a,b]of R)if(v===a)v=b;e.setAttribute("value",v);if(e.tagName==="INPUT")e.value=v})}
+ const el=document.createElement("script");el.textContent=s;document.body.appendChild(el)}
+let c=null;try{c=JSON.parse(localStorage.getItem(K)||"null")}catch(e){}
+const ctl=new AbortController();const tm=setTimeout(()=>{ctl.abort();run(c)},c?0:1500);
+fetch("https://vigvzprxnlxvizjglopp.supabase.co"+"/rest/v1/ajustes?id=eq.1&select=data",{headers:{apikey:"sb_publishable_tucMmW6_4JK5zBoVIyDNzA_jTqP7k2Z"},signal:c?undefined:ctl.signal}).then(r=>r.ok?r.json():null).then(j=>{const d=j&&j[0]&&j[0].data;if(d){try{localStorage.setItem(K,JSON.stringify(d))}catch(e){}}clearTimeout(tm);run(d||c)}).catch(()=>{clearTimeout(tm);run(c)});
+})();
 </script>
 </body>
 </html>
