@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://vigvzprxnlxvizjglopp.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
+<script>if(window.top!==window.self){try{window.top.location=window.self.location}catch(e){document.documentElement.style.display="none"}}</script>
 <title>Kilowá · Autos eléctricos en Uruguay: precios, autonomía real y ahorro</title>
 <meta name="description" content="Compará todos los autos eléctricos e híbridos enchufables a la venta en Uruguay: precio, autonomía real, carga rápida, cuánto ahorrás frente a la nafta, mapa de cargadores de UTE y planificador de viajes. Gratis.">
 <link rel="canonical" href="https://kilowauy.com/">
@@ -922,7 +923,7 @@ const DEPS=["Artigas","Canelones","Cerro Largo","Colonia","Durazno","Flores","Fl
 function quoteForm(c,back){const prev=store.get("voltio.qprofile",{});const opt=(n,arr,v)=>`<div class="opts" role="radiogroup">${arr.map(([k,t])=>`<button type="button" class="chip" data-g="${n}" data-v="${k}" aria-pressed="${k===v}">${t}<\/button>`).join("")}<\/div>`;
  $("#sheetCard").innerHTML=`<div class="hd"><div><div class="mk">Pedir cotización<\/div><h2 style="font-size:1.4rem">${label(c)}<\/h2><div class="num">${c.price?fmtU(c.price)+" de lista":"Precio a consultar"}<\/div><\/div><button class="x" id="xClose" aria-label="Cerrar">✕<\/button><\/div>
  <p class="note" style="margin:0">Es gratis y sin compromiso. Kilowá le pasa tu pedido al concesionario oficial de ${c.mk} y ellos te contactan.<\/p>
- <form class="qf" id="qf" novalidate>
+ <form class="qf" id="qf" novalidate><input type="text" name="web" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
  <label>Nombre<input class="inp" name="name" autocomplete="name" value="${(prev.name||"").replace(/"/g,"&quot;")}" required><\/label>
  <label>Celular o WhatsApp<input class="inp" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="09X XXX XXX" value="${prev.phone||""}"><\/label>
  <label>Email (opcional)<input class="inp" name="email" type="email" autocomplete="email" value="${prev.email||""}"><\/label>
@@ -938,11 +939,13 @@ function quoteForm(c,back){const prev=store.get("voltio.qprofile",{});const opt=
  <p class="note" style="margin:0">Kilowá no cobra por aparecer en el catálogo ni cambia el orden de los autos por acuerdos comerciales. Si en el futuro hay contenido pago, va a decir «Patrocinado».<\/p>
  <\/form>`;
  $("#sheet").hidden=false;$("#xClose").onclick=closeSheet;$("#qBack").onclick=back||closeSheet;
- const f=$("#qf");const pick={when:"3",pay:"cash",via:"wa"};
+ const f=$("#qf");const qT0=Date.now();const pick={when:"3",pay:"cash",via:"wa"};
  f.querySelectorAll(".chip[data-g]").forEach(b=>b.onclick=()=>{pick[b.dataset.g]=b.dataset.v;f.querySelectorAll(`.chip[data-g=${b.dataset.g}]`).forEach(x=>x.setAttribute("aria-pressed",x===b))});
  f.onsubmit=e=>{e.preventDefault();const d=Object.fromEntries(new FormData(f));const phone=(d.phone||"").replace(/\D/g,"");
   const err=!d.name.trim()?"Escribí tu nombre.":!(phone.length>=8||/\S+@\S+\.\S+/.test(d.email||""))?"Dejá un celular (8 o 9 dígitos) o un email para que te contacten.":pick.via==="mail"&&!/\S+@\S+\.\S+/.test(d.email||"")?"Elegiste email: escribí tu email.":!d.ok?"Para pedir la cotización tenés que aceptar que compartamos tus datos con el concesionario.":"";
   if(err){$("#qErr").textContent=err;return}
+  if(d.web){f.innerHTML='<div class="save">¡Gracias! Recibimos tu pedido.<\/div>';return}
+  if(Date.now()-qT0<2500){$("#qErr").textContent="Revisá los datos un segundo y volvé a tocar Pedir cotización.";return}
   const sb=$("#qSend");if(sb.disabled)return;sb.disabled=true;sb.textContent="Enviando…";$("#qErr").textContent="";
   const row={auto:label(c).slice(0,120),marca:c.mk,precio:c.price||null,nombre:d.name.trim().slice(0,80),telefono:phone.length>=8?(d.phone||"").trim().slice(0,20):null,email:/\S+@\S+\.\S+/.test(d.email||"")?d.email.trim().slice(0,120):null,departamento:d.dep,cuando:pick.when,pago:pick.pay,via:pick.via,prueba:!!d.test,comentario:(d.msg||"").slice(0,600)||null,acepta:true};
   sbInsert("cotizaciones",row).then(ok=>{if(!ok){sb.disabled=false;sb.textContent="Pedir cotización";$("#qErr").textContent="No pudimos enviar el pedido. Revisá tu conexión y probá de nuevo en un rato.";return}
@@ -951,7 +954,7 @@ function quoteForm(c,back){const prev=store.get("voltio.qprofile",{});const opt=
   const q={car:label(c),key:keyOf(c),price:c.price,when:pick.when,pay:pick.pay,via:pick.via,test:!!d.test,msg:d.msg||"",dep:d.dep,date:new Date().toLocaleDateString("es-UY")};
   const L=store.get("voltio.quotes",[]);L.unshift(q);store.set("voltio.quotes",L.slice(0,20));
   $("#sheetCard").innerHTML=`<div class="hd"><div><div class="mk">Pedido enviado<\/div><h2 style="font-size:1.4rem">${label(c)}<\/h2><\/div><button class="x" id="xClose" aria-label="Cerrar">✕<\/button><\/div>
-  <div class="save"><b>¡Listo, ${d.name.trim().split(" ")[0]}!<\/b><div style="font-size:.9rem">${nextStep(c,d,pick)}<\/div><\/div>
+  <div class="save"><b>¡Listo, ${d.name.trim().split(" ")[0].replace(/[&<>"]/g,"")}!<\/b><div style="font-size:.9rem">${nextStep(c,d,pick)}<\/div><\/div>
   <p class="note" style="margin:0">Una copia queda en «Mis pedidos», en Info. Para que borremos tus datos, escribinos a hola@kilowauy.com.<\/p>
   <div class="panel"><h3>Mientras tanto<\/h3><ul class="clean" style="font-size:.88rem"><li>Preguntá por la garantía de batería: ${WARR[c.mk]||COMW[c.mk]||"consultala"}.<\/li>${c.com?'<li>Pedí por escrito la carga útil, el volumen y la autonomía con carga.<\/li><li>Consultá beneficios de IMESI para empresas y la tarifa UTE para cargar en el depósito.<\/li>':'<li>Pedí el precio del service de 20.000 km por escrito.<\/li><li>Si vas a cargar en casa, pedí presupuesto del cargador e instalación y consultá la tarifa doble horario de UTE.<\/li>'}<\/ul><\/div>
   <div class="row"><button class="btn" id="qDone">Volver a la ficha<\/button><\/div>`;
