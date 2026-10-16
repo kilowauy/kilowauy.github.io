@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://vigvzprxnlxvizjglopp.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://upload.wikimedia.org https://thumb.wikimedia.org; connect-src 'self' https://vigvzprxnlxvizjglopp.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <script>if(window.top!==window.self){try{window.top.location=window.self.location}catch(e){document.documentElement.style.display="none"}}</script>
 <title>Kilowá · Autos eléctricos en Uruguay: precios, autonomía real y ahorro</title>
@@ -123,7 +123,7 @@ a{color:var(--accent)}
 .curve .lane b{font:500 .84rem var(--mono);text-align:right}
 /* mapa */
 .mapbox{position:relative;background:var(--water);border-radius:var(--r);overflow:hidden;border:1px solid var(--line)}
-.mapbox svg{display:block;width:100%;height:auto}
+.mapbox svg{display:block;width:100%;height:auto;touch-action:none;cursor:grab}.mapbox svg.drag{cursor:grabbing}.zctl{position:absolute;right:10px;top:10px;display:grid;gap:6px;z-index:2}.zctl button{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:600 1.2rem var(--body);cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25)}.zhint{position:absolute;left:10px;bottom:10px;font-size:.72rem;color:var(--muted);background:rgba(14,19,17,.75);padding:3px 8px;border-radius:8px;pointer-events:none}.tmapw{position:relative}.tmapw .tmap{touch-action:none;cursor:grab}.pick{display:grid;gap:6px;margin-top:6px}.pick button{text-align:left;background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:8px 10px;color:var(--fg);cursor:pointer;font-size:.86rem}.pick button small{display:block;color:var(--muted);font-size:.74rem}
 .dep{fill:var(--land);stroke:var(--land-line);stroke-width:1.4}
 .dep.sel{fill:var(--sunk)}
 .pt{cursor:pointer}
@@ -312,7 +312,7 @@ nav.tabs button[data-v="info"]{display:none}
 </style>
 </head>
 <body>
-<div class="wrap">
+<style>.car .ph{grid-column:1/-1;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;background:var(--sunk);margin-bottom:6px;display:block}.fph{margin:0;display:grid;gap:4px}.fph img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:14px;background:var(--sunk)}.fph figcaption{font-size:.7rem;color:var(--muted)}.fph figcaption a{color:var(--muted)}</style><div class="wrap">
 <header class="top">
   <div class="brand">
     <svg width="36" height="36" viewBox="0 0 34 34" aria-hidden="true"><rect x="1" y="1" width="32" height="32" rx="9" fill="var(--accent)"/><path d="M11 8v18M11 17l9-9M14 15l8 11" stroke="var(--accent-ink)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -414,7 +414,7 @@ nav.tabs button[data-v="info"]{display:none}
   </div>
   <div class="chips" id="mapChips" role="group" aria-label="Filtro de cargadores"></div>
   <div class="maptools"><button class="chip" id="mapNear">📍 Más cercanas a mí</button><button class="chip" id="mapZoom" hidden></button></div>
-  <div class="mapbox"><svg id="map" role="img" aria-label="Mapa de Uruguay con las estaciones de carga de UTE"></svg></div>
+  <div class="mapbox"><div class="zctl"><button type="button" id="zIn" aria-label="Acercar">+</button><button type="button" id="zOut" aria-label="Alejar">−</button><button type="button" id="zAll" aria-label="Ver todo el país" style="font-size:.8rem">⤢</button></div><div class="zhint">Pellizcá o usá + y − para acercarte</div><svg id="map" role="img" aria-label="Mapa de Uruguay con las estaciones de carga de UTE"></svg></div>
   <div class="legend"><span><i class="f"></i>Rápida 60 kW</span><span><i class="m"></i>Rápida 20–30 kW</span><span><i></i>Solo lenta (AC)</span></div>
   <div id="mapPop" class="pop"></div>
   <div class="panel" id="mapListP"><h2>Estaciones</h2><div id="mapList"></div></div>
@@ -818,7 +818,7 @@ function renderList(){const q=$("#q").value.trim().toLowerCase();const pm=+$("#p
  const br=$("#brand").value;let L=CARS.filter(c=>(!br||c.mk===br)&&(!typeF||(typeF==="W"?!!WATCH[keyOf(c)]:typeF==="E"?c.type==="E":c.type!=="E"))&&(!bodyF||c.body===bodyF)&&(pm>=120000||c.price<=pm)&&(!q||label(c).toLowerCase().includes(q)));
  L.sort(s==="price"?(a,b)=>a.price-b.price:s==="range"?(a,b)=>b.rng-a.rng:s==="dc"?(a,b)=>(a.tmax??999)-(b.tmax??999)||a.price-b.price:s==="maint"?(a,b)=>a.m5-b.m5||a.price-b.price:s==="kmusd"?(a,b)=>b.kmusd-a.kmusd:s==="kwh"?(a,b)=>b.kwh-a.kwh:(a,b)=>(a.top||99)-(b.top||99)||a.price-b.price);
  $("#count").textContent=`${L.length} versiones de ${(n=>n===1?"1 marca":n+" marcas")(new Set(L.map(c=>c.mk)).size)} · ${L.filter(c=>c.type==="E").length} eléctricas y ${L.filter(c=>c.type!=="E").length} híbridas enchufables`;
- $("#list").innerHTML=L.length?L.map(c=>`<button class="car" data-id="${c.id}"><div><div class="mk">${c.mk} · ${BODY[c.body]}<\/div><div class="nm">${c.md}<\/div><div class="vr">${c.vr!=="—"?c.vr:"Versión única"}<\/div><\/div><div class="pr">${fmtU(c.price)}<\/div>
+ $("#list").innerHTML=L.length?L.map(c=>`<button class="car" data-id="${c.id}">${fotoImg(c)}<div><div class="mk">${c.mk} · ${BODY[c.body]}<\/div><div class="nm">${c.md}<\/div><div class="vr">${c.vr!=="—"?c.vr:"Versión única"}<\/div><\/div><div class="pr">${fmtU(c.price)}<\/div>
  <div class="stats">${c.type==="E"?`<span>Real <b>${c.rng} km<\/b><\/span><span>Ruta <b>${c.hw} km<\/b><\/span>`:`<span>Eléctrica <b>${c.rng} km<\/b><\/span><span>Total <b>${c.total.toLocaleString("es-UY")} km<\/b><\/span>`}<span>Batería <b>${c.kwh} kWh<\/b><\/span><span>Rápida <b>${c.dc?(c.src==="e"?"~":"")+c.dc+" kW":"no"}<\/b><\/span><\/div><div class="bar"><i style="width:${Math.round(c.rng/MAXR*100)}%"><\/i><\/div>
  <div class="tags">${(w=>w?`<span class="tag ${w.diff<0?"i0":w.diff>0?"i9":"top"}">${w.diff<0?`★ Bajó ${fmtU(-w.diff)}`:w.diff>0?`★ Subió ${fmtU(w.diff)}`:"★ Siguiendo"}<\/span>`:"")(watchInfo(c))}${c.type!=="E"?`<span class="tag hy">${TYPE[c.type]}<\/span>`:""}${c.top?`<span class="tag top">#${c.top} en ventas 2025<\/span>`:""}${imesiTag(c)}${c.conn==="GB/T"?'<span class="tag gbt">Conector GB/T: necesita adaptador<\/span>':""}${c.post.lvl===3?'<span class="tag i0">Red de talleres amplia<\/span>':c.post.lvl===1?'<span class="tag i5">Pocos talleres<\/span>':""}${c.note?`<span class="tag">${c.note}<\/span>`:""}<\/div><\/button>`).join(""):(typeF==="W"?'<div class="empty">Todavía no seguís ningún auto. Abrí una ficha y tocá «Seguir precio»: si el precio cambia, lo vas a ver acá.<\/div>':'<div class="empty">Ningún auto cumple esos filtros. Subí el precio máximo o elegí otra carrocería.<\/div>');
  $("#list").querySelectorAll(".car").forEach(b=>b.onclick=()=>openCar(+b.dataset.id))}
@@ -877,7 +877,7 @@ function maintPanel(c){const p=c.post;const m=c.type==="E"?maint(c,15000,5):main
  <p class="note">Las reparaciones en garantía se hacen en el service oficial. Alineación, balanceo y rotación no suelen estar incluidos y se pueden hacer en cualquier gomería sin perder la garantía.<\/p><\/div>`}
 function openCar(id){try{const _c=CARS[id];if(_c)track("ficha",label(_c))}catch(e){}const c=CARS[id];const homeV=c.eff*2.98,homeS=c.eff*10.31,dc=c.eff*(11.8+132.9/30),naf=7*90.45,hyb=c.type!=="E";
  $("#sheetCard").innerHTML=`<div class="hd"><div><div class="mk">${c.mk} · ${BODY[c.body]}<\/div><h2 style="font-size:1.6rem">${c.md}<\/h2><div style="color:var(--muted)">${c.vr!=="—"?c.vr:"Versión única"}<\/div><\/div><button class="x" id="xClose" aria-label="Cerrar">✕<\/button><\/div>
- <div class="big">${fmtU(c.price)}<\/div>
+ ${fotoFig(c)}<div class="big">${fmtU(c.price)}<\/div>
  <div class="note" style="margin-top:-10px">Precio de lista con IVA al ${DATES.price} · ${(w=>w?(w.diff?`${w.diff<0?"bajó":"subió"} ${fmtU(Math.abs(w.diff))} desde que lo seguís (${w.d})`:`lo seguís desde el ${w.d}`):"seguilo para enterarte si cambia")(watchInfo(c))}<\/div>
  <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag ${hyb?"hy":""}">${TYPE[c.type]}<\/span>${c.top?`<span class="tag top">#${c.top} en ventas 2025<\/span>`:""}${imesiTag(c)}<\/div>
  ${gauge(c)}${keyStats(c)}${ownStrip(c)}
@@ -1242,11 +1242,11 @@ function tripMap(oI,dI,plan,outN,rt){const O={la:CITY[oI][1],lo:CITY[oI][2]},D={
  const dots=ST.filter(s=>s.dc>=30).map(s=>{const[x,y]=proj(s.la,s.lo);return x>vb[0]&&x<vb[0]+w&&y>vb[1]&&y<vb[1]+h?`<circle cx="${f(x)}" cy="${f(y)}" r="${f(2.2*k)}" fill="var(--muted)" opacity=".45"/>`:""}).join("");
  const stop=(st,n)=>{const[x,y]=proj(st.la,st.lo);return`<g><circle cx="${f(x)}" cy="${f(y)}" r="${f(9*k)}" fill="var(--sol)" stroke="var(--bg)" stroke-width="${f(2*k)}"/><text x="${f(x)}" y="${f(y+3.6*k)}" text-anchor="middle" font-size="${f(10*k)}" font-weight="700" fill="var(--accent-ink)" font-family="var(--mono)">${n}<\/text><\/g>`};
  const city=(p,n)=>{const[x,y]=proj(p.la,p.lo);return`<circle cx="${f(x)}" cy="${f(y)}" r="${f(7*k)}" fill="var(--accent)" stroke="var(--bg)" stroke-width="${f(2.5*k)}"/><text x="${f(x)}" y="${f(y-12*k)}" text-anchor="middle" font-size="${f(12*k)}" font-weight="600" fill="var(--fg)" stroke="var(--bg)" stroke-width="${f(3*k)}" paint-order="stroke">${n}<\/text>`};
- return`<svg class="tmap" viewBox="${vb.map(f).join(" ")}" role="img" aria-label="Mapa del viaje de ${CITY[oI][0]} a ${CITY[dI][0]} por ruta, con ${plan.length} paradas">
+ return`<div class="tmapw"><div class="zctl"><button type="button" class="tzIn" aria-label="Acercar">+<\/button><button type="button" class="tzOut" aria-label="Alejar">−<\/button><\/div><svg class="tmap" data-vb="${vb.map(f).join(" ")}" viewBox="${vb.map(f).join(" ")}" role="img" aria-label="Mapa del viaje de ${CITY[oI][0]} a ${CITY[dI][0]} por ruta, con ${plan.length} paradas">
  ${MAP.deps.map(d=>`<path d="${d.d}" fill="var(--land)" stroke="var(--line)" stroke-width="${f(1.2*k)}"/>`).join("")}${dots}
  ${rt?`<polyline points="${line(go)}" fill="none" stroke="var(--sol)" stroke-width="${f(8*k)}" stroke-opacity=".35" stroke-linecap="round" stroke-linejoin="round"/>`:""}
  <polyline points="${line(go)}" fill="none" stroke="var(--accent)" stroke-width="${f(3.5*k)}" stroke-linecap="round" stroke-linejoin="round"/>
- ${plan.map((p,i)=>stop(p.st,i+1)).join("")}${city(O,CITY[oI][0])}${oI!==dI?city(D,CITY[dI][0]):""}<\/svg>
+ ${plan.map((p,i)=>stop(p.st,i+1)).join("")}${city(O,CITY[oI][0])}${oI!==dI?city(D,CITY[dI][0]):""}<\/svg><\/div>
  <div class="glg" style="margin-top:0"><span><i style="background:var(--accent)"><\/i>${R&&R.approx?"Trazado aproximado":rt?"Ida y vuelta por la misma ruta":"Ruta recomendada"}<\/span><span><i style="background:var(--muted);opacity:.6"><\/i>Cargadores rápidos UTE<\/span><\/div>`}
 function gmapsUrl(oI,dI,plan,outN,rt){const ll=p=>p.la.toFixed(5)+","+p.lo.toFixed(5);const O={la:CITY[oI][1],lo:CITY[oI][2]},D={la:CITY[dI][1],lo:CITY[dI][2]};const ws=plan.slice(0,outN).map(p=>p.st);
  return"https://www.google.com/maps/dir/?api=1&travelmode=driving&origin="+ll(O)+"&destination="+ll(D)+(ws.length?"&waypoints="+encodeURIComponent(ws.map(ll).join("|")):"")}
@@ -1275,6 +1275,7 @@ function trip(){const c=CARS[+$("#tCar").value];const oI=+$("#tOrig").value,dI=+
  <div class="legs">${legs.join("")}<\/div>${hiN}${cap}
  <div class="row"><a class="btn" href="${gmapsUrl(oI,dI,plan,outN,rt)}" target="_blank" rel="noopener">Abrir en Google Maps<\/a><button class="btn ghost" id="tShare">Compartir el plan<\/button><\/div>
  <p class="note">La ruta y las distancias son las de la red vial real (OpenStreetMap). Las paradas son cargadores rápidos reales de UTE que están sobre la ruta o a pocos kilómetros, elegidos para avanzar lo más posible en cada tramo. Con frío, lluvia o aire acondicionado al máximo, contá con 10–20% menos de alcance. Antes de salir, revisá en UTE Mueve que el cargador de cada parada esté operativo.<\/p>`;
+ {const t=$("#tOut .tmap");if(t){const b=t.dataset.vb.split(" ").map(Number);const pz=panZoom(t,{limit:[b[0]-b[2],b[1]-b[3],b[2]*3,b[3]*3],minW:b[2]/8});$("#tOut .tzIn").onclick=()=>pz.zoom(1.6);$("#tOut .tzOut").onclick=()=>pz.zoom(1/1.6)}}
  $("#tShare").onclick=()=>shareWA(`${on} → ${dn}${rt?" y vuelta":""} con ${c.mk} ${c.md} (~${d} km): ${stops?`${stops} ${stops>1?"paradas":"parada"} de carga: ${plan.map((p,k)=>`${k+1}) ${p.st.name}, ${p.st.city}`).join("; ")}`:"sin paradas de carga"}. Plan armado con Kilowá.`)}
 
 // mapa
@@ -1295,20 +1296,44 @@ const mfOk=s=>mapF==="all"||(mapF==="f"&&s.cls==="f")||(mapF==="dc"&&s.dc>0)||(m
 const mc=$("#mapChips");MF.forEach(([k,t])=>{const b=document.createElement("button");b.className="chip";b.textContent=t;b.setAttribute("aria-pressed",k==="all");b.onclick=()=>{mapF=k;mc.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed",x===b));mapDrawn=false;drawMap()};mc.appendChild(b)});
 function depBox(d){const pts=ST.filter(s=>s.dep===d).map(s=>proj(s.la,s.lo));if(!pts.length)return null;let x0=Math.min(...pts.map(p=>p[0])),x1=Math.max(...pts.map(p=>p[0])),y0=Math.min(...pts.map(p=>p[1])),y1=Math.max(...pts.map(p=>p[1]));
  const w=Math.max(x1-x0,40)*1.35,h=Math.max(y1-y0,40)*1.35,cx=(x0+x1)/2,cy=(y0+y1)/2,s=Math.max(w,h/ (MAP.H/MAP.W));return[cx-s/2,cy-s*MAP.H/MAP.W/2,s,s*MAP.H/MAP.W]}
-function drawMap(){if(mapDrawn)return;mapDrawn=true;const svg=$("#map");const vb=(selDep&&depBox(selDep))||[0,0,MAP.W,MAP.H];const z=vb[2]/MAP.W;
+
+// Zoom y arrastre para mapas SVG: rueda, pellizco, doble toque y botones. onTap recibe el punto tocado en coordenadas del mapa.
+function panZoom(svg,opt){opt=opt||{};const P=new Map();let start=null,moved=false,last=0;
+ const vb=()=>svg.getAttribute("viewBox").split(/\s+/).map(Number);
+ const set=v=>{const lim=opt.limit||[0,0,MAP.W,MAP.H],minW=(opt.minW||30),maxW=lim[2]*1.15;let[x,y,w,h]=v;const r=h/w;w=Math.min(maxW,Math.max(minW,w));h=w*r;
+  x=Math.min(lim[0]+lim[2]-w*.25,Math.max(lim[0]-w*.75,x));y=Math.min(lim[1]+lim[3]-h*.25,Math.max(lim[1]-h*.75,y));svg.setAttribute("viewBox",[x,y,w,h].map(n=>n.toFixed(2)).join(" "));opt.onZ&&opt.onZ(w)};
+ const toMap=(cx,cy)=>{const b=svg.getBoundingClientRect(),v=vb();return[v[0]+(cx-b.left)/b.width*v[2],v[1]+(cy-b.top)/b.height*v[3]]};
+ const zoomAt=(mx,my,f)=>{const v=vb();const w=v[2]/f,h=v[3]/f;set([mx-(mx-v[0])/f,my-(my-v[1])/f,w,h])};
+ svg.addEventListener("wheel",e=>{e.preventDefault();const[mx,my]=toMap(e.clientX,e.clientY);zoomAt(mx,my,e.deltaY<0?1.35:1/1.35)},{passive:false});
+ svg.addEventListener("pointerdown",e=>{const hn=svg.parentNode.querySelector(".zhint");if(hn)hn.remove();svg.setPointerCapture(e.pointerId);P.set(e.pointerId,[e.clientX,e.clientY]);moved=false;start={v:vb(),pts:new Map(P)};svg.classList.add("drag")});
+ svg.addEventListener("pointermove",e=>{if(!P.has(e.pointerId))return;P.set(e.pointerId,[e.clientX,e.clientY]);const b=svg.getBoundingClientRect(),v0=start.v;
+  if(P.size===1){const[id]=P.keys(),p0=start.pts.get(id);if(!p0)return;const dx=e.clientX-p0[0],dy=e.clientY-p0[1];if(Math.hypot(dx,dy)>6)moved=true;if(moved)set([v0[0]-dx/b.width*v0[2],v0[1]-dy/b.height*v0[3],v0[2],v0[3]])}
+  else if(P.size>=2){moved=true;const ids=[...P.keys()].slice(0,2),a=P.get(ids[0]),c=P.get(ids[1]),a0=start.pts.get(ids[0]),c0=start.pts.get(ids[1]);if(!a0||!c0)return;
+   const d0=Math.hypot(a0[0]-c0[0],a0[1]-c0[1])||1,d1=Math.hypot(a[0]-c[0],a[1]-c[1])||1,f=d1/d0;const mx0=(a0[0]+c0[0])/2,my0=(a0[1]+c0[1])/2,mx1=(a[0]+c[0])/2,my1=(a[1]+c[1])/2;
+   const px=v0[0]+(mx0-b.left)/b.width*v0[2],py=v0[1]+(my0-b.top)/b.height*v0[3];const w=v0[2]/f,h=v0[3]/f;set([px-(mx1-b.left)/b.width*w,py-(my1-b.top)/b.height*h,w,h])}});
+ const end=e=>{if(!P.has(e.pointerId))return;P.delete(e.pointerId);if(P.size===0){svg.classList.remove("drag");
+   if(!moved){const now=Date.now(),[mx,my]=toMap(e.clientX,e.clientY);if(now-last<300&&!opt.onTap){zoomAt(mx,my,2)}else if(opt.onTap){const b=svg.getBoundingClientRect();opt.onTap(mx,my,vb()[2]/b.width)}last=now}}
+  else start={v:vb(),pts:new Map(P)}};
+ svg.addEventListener("pointerup",end);svg.addEventListener("pointercancel",end);
+ return{zoom:f=>{const v=vb();zoomAt(v[0]+v[2]/2,v[1]+v[3]/2,f)},set,zoomAt,vb}}
+let MVB=null,MPZ=null;
+function mapScale(w){const z=w/MAP.W,svg=$("#map"),R={f:6,m:5,a:4},k=Math.max(z,.03);svg.querySelectorAll(".pt").forEach(g=>{const c=g.querySelectorAll("circle");const cl=g.classList.contains("f")?"f":g.classList.contains("m")?"m":"a";c[0].setAttribute("r",(12*k).toFixed(2));c[1].setAttribute("r",(R[cl]*Math.max(k,.06)).toFixed(2));c[1].style.strokeWidth=(2*Math.max(k,.06)).toFixed(2)});svg.querySelectorAll(".dep").forEach(p=>p.style.strokeWidth=(1.4*z).toFixed(2));svg.querySelectorAll(".maplbl").forEach(t=>t.style.fontSize=(11*Math.max(z,.25)).toFixed(1)+"px");MVB=svg.getAttribute("viewBox").split(" ").map(Number)}
+function mapTap(mx,my,upp){const vis=ST.filter(mfOk);const rad=22*upp;const near=vis.map(s=>{const[x,y]=proj(s.la,s.lo);return[s,Math.hypot(x-mx,y-my)]}).filter(a=>a[1]<=rad).sort((a,b)=>a[1]-b[1]);if(!near.length){const p=document.elementsFromPoint?null:null;return}if(near.length===1){pick(near[0][0].i);return}const cx=near.reduce((a,b)=>a+proj(b[0].la,b[0].lo)[0],0)/near.length,cy=near.reduce((a,b)=>a+proj(b[0].la,b[0].lo)[1],0)/near.length;if(MPZ){const v=MPZ.vb();if(v[2]>40)MPZ.zoomAt(cx,cy,Math.min(4,v[2]/40));const w=MPZ.vb();MPZ.set([cx-w[2]/2,cy-w[3]/2,w[2],w[3]])}$("#mapPop").innerHTML=`<div class="mk">${near.length} cargadores en esta zona<\/div><p style="margin:0;color:var(--muted);font-size:.86rem">Te acercamos el mapa. Elegí uno:<\/p>${near.length>12?`<p class="note" style="margin:0">Mostramos los 12 más cercanos al toque. Acercate más para ver el resto.<\/p>`:""}<div class="pick">${near.slice(0,12).map(([s])=>`<button data-i="${s.i}">${s.name}<small>${s.city} · ${s.dc?s.dc+" kW rápida":"solo lenta"} · ${s.addr}<\/small><\/button>`).join("")}<\/div>`;$("#mapPop").querySelectorAll(".pick button").forEach(b=>b.onclick=()=>pick(+b.dataset.i))}
+function drawMap(){if(mapDrawn)return;mapDrawn=true;const svg=$("#map");const vb=MVB||(selDep&&depBox(selDep))||[0,0,MAP.W,MAP.H];const z=vb[2]/MAP.W;
  svg.setAttribute("viewBox",vb.map(v=>v.toFixed(1)).join(" "));
  const vis=ST.filter(mfOk).sort((a,b)=>"amf".indexOf(a.cls)-"amf".indexOf(b.cls));
  const R={f:6,m:5,a:4};
  svg.innerHTML=MAP.deps.map(d=>`<path class="dep${d.n===selDep?" sel":""}" data-d="${d.n}" d="${d.d}" style="stroke-width:${(1.4*z).toFixed(2)}"><title>${d.n}<\/title><\/path>`).join("")+
  vis.map(s=>{const [x,y]=proj(s.la,s.lo);return`<g class="pt ${s.cls}${s.i===selSt?" on":""}" data-i="${s.i}" tabindex="0" role="button" aria-label="${s.name}"><circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="${(12*z).toFixed(2)}" fill="transparent"/><circle class="o" cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="${(R[s.cls]*Math.max(z,.16)).toFixed(2)}" style="stroke-width:${(2*Math.max(z,.16)).toFixed(2)}"/><\/g>`}).join("")+
  (selDep?"":["Montevideo|-34.6|-56.2","Salto|-31.39|-57.96","Rivera|-30.905|-55.55","Paysandú|-32.32|-58.08","Tacuarembó|-31.71|-55.98","Durazno|-33.38|-56.52","Punta del Este|-34.96|-54.94","Rocha|-34.48|-54.33","Colonia|-34.47|-57.84","Melo|-32.37|-54.17","Artigas|-30.40|-56.47","Treinta y Tres|-33.23|-54.38","Mercedes|-33.25|-58.03","Minas|-34.37|-55.23"].map(t=>{const[n,la,lo]=t.split("|");const [x,y]=proj(+la,+lo);const left=x>470;return`<text class="maplbl" x="${(x+(left?-11:11)).toFixed(0)}" y="${(y+(n==="Montevideo"?30:4)).toFixed(0)}" text-anchor="${n==="Montevideo"?"middle":left?"end":"start"}">${n}<\/text>`}).join(""));
- svg.querySelectorAll(".pt").forEach(g=>{const f=()=>pick(+g.dataset.i);g.onclick=e=>{e.stopPropagation();f()};g.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();f()}}});
- svg.querySelectorAll(".dep").forEach(p=>p.onclick=()=>{if(selDep!==p.dataset.d){selDep=p.dataset.d;mapDrawn=false;drawMap()}});
+ svg.querySelectorAll(".pt").forEach(g=>{const f=()=>pick(+g.dataset.i);g.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();f()}}});
+ if(!MPZ){MPZ=panZoom(svg,{onZ:mapScale,minW:12,onTap:(mx,my,upp)=>{const vis=ST.filter(mfOk);const hit=vis.some(s=>{const[x,y]=proj(s.la,s.lo);return Math.hypot(x-mx,y-my)<=22*upp});if(hit){mapTap(mx,my,upp);return}const el=document.elementFromPoint(...(()=>{const b=svg.getBoundingClientRect(),v=MPZ.vb();return[b.left+(mx-v[0])/v[2]*b.width,b.top+(my-v[1])/v[3]*b.height]})());const d=el&&el.closest&&el.closest(".dep");if(d&&selDep!==d.dataset.d){selDep=d.dataset.d;MVB=null;mapDrawn=false;drawMap()}}});$("#zIn").onclick=()=>MPZ.zoom(1.6);$("#zOut").onclick=()=>MPZ.zoom(1/1.6);$("#zAll").onclick=()=>{selDep=null;MVB=null;mapDrawn=false;drawMap()}}
+ mapScale(vb[2]);
  $("#mapZoom").hidden=!selDep;$("#mapZoom").textContent=selDep?`← Ver todo Uruguay (estás en ${selDep})`:"";
  renderPop();renderLocList()}
-function pick(i,zoom){selSt=i;if(zoom)selDep=ST[i].dep;mapDrawn=false;drawMap()}
+function pick(i,zoom){selSt=i;if(zoom){selDep=ST[i].dep;MVB=null}mapDrawn=false;drawMap();if(zoom&&MPZ){const[x,y]=proj(ST[i].la,ST[i].lo);const v=MPZ.vb();if(v[2]>60)MPZ.zoomAt(x,y,v[2]/60);MPZ.set([x-MPZ.vb()[2]/2,y-MPZ.vb()[3]/2,MPZ.vb()[2],MPZ.vb()[3]])}}
 const conTxt=s=>s.con.map(c=>`<span class="cn${c.t==="Tipo 2"?"":" dc"}">${c.n} × ${c.t} ${String(c.kw).replace(".",",")} kW<\/span>`).join("");
-function renderPop(){const p=$("#mapPop");if(selSt==null){p.innerHTML=`<div class="mk">Tocá un punto<\/div><p style="margin:0;color:var(--muted);font-size:.88rem">Tocá un departamento para acercarte y un punto para ver la estación: dirección, conectores y potencia.<\/p>`;return}
+function renderPop(){const p=$("#mapPop");if(selSt==null){p.innerHTML=`<div class="mk">Tocá un punto<\/div><p style="margin:0;color:var(--muted);font-size:.88rem">Pellizcá o usá + y − para acercarte, arrastrá para moverte y tocá un punto para ver la estación. Si hay varios juntos, te mostramos la lista para elegir.<\/p>`;return}
  const s=ST[selSt];const fast=s.dc?`Carga DC: bajada de bandera $132,9 + $11,8/kWh`:`Carga AC: bajada de bandera $54,8 + $10,4/kWh`;
  p.innerHTML=`<div class="mk">${s.city} · ${s.dep} · ${TL[s.cls]}<\/div><h3 style="font-size:1.15rem">${s.name}<\/h3><p style="margin:0;font-size:.9rem">${s.addr}<\/p><div class="cns">${conTxt(s)}<\/div><p class="note" style="margin:0">${fast}. ${s.gbt?"Tiene conector GB/T (autos chinos con toma GB/T). ":""}Disponibilidad en tiempo real en UTE Mueve.<\/p><a class="chip" style="justify-self:start;text-decoration:none" href="https://www.google.com/maps/dir/?api=1&destination=${s.la},${s.lo}" target="_blank" rel="noopener">Cómo llegar ↗<\/a>`}
 const km=(a,b,c,d)=>{const R=6371,r=Math.PI/180,x=(d-b)*r*Math.cos((a+c)/2*r),y=(c-a)*r;return R*Math.hypot(x,y)};
@@ -1318,7 +1343,7 @@ function renderLocList(){const L=ST.filter(mfOk);
  else{const by={};L.forEach(s=>(by[s.dep]=by[s.dep]||[]).push(s));
   $("#mapList").innerHTML=Object.keys(by).sort((a,b)=>a.localeCompare(b)).map(d=>`<details class="depl"${d===selDep?" open":""}><summary><span>${d}<\/span><span>${by[d].length} · ${by[d].filter(s=>s.dc).length} rápidas<\/span><\/summary>${by[d].sort((a,b)=>a.city.localeCompare(b.city)||b.dc-a.dc).map(s=>`<button class="loc${s.i===selSt?" on":""}" data-i="${s.i}"><span>${s.name}<small>${s.city} · ${s.addr}<\/small><\/span><span>${s.dc?s.dc+" kW":"AC"}<\/span><\/button>`).join("")}<\/details>`).join("")}
  $("#mapList").querySelectorAll(".loc").forEach(b=>b.onclick=()=>{pick(+b.dataset.i,true);$("#map").scrollIntoView({behavior:"smooth",block:"center"})})}
-$("#mapZoom").onclick=()=>{selDep=null;mapDrawn=false;drawMap()};
+$("#mapZoom").onclick=()=>{selDep=null;MVB=null;mapDrawn=false;drawMap()};
 $("#mapNear").onclick=()=>{const b=$("#mapNear");if(near){near=null;b.textContent="📍 Más cercanas a mí";renderLocList();return}
  if(!navigator.geolocation){b.textContent="Ubicación no disponible";return}b.textContent="Buscando tu ubicación…";
  navigator.geolocation.getCurrentPosition(p=>{near=[p.coords.latitude,p.coords.longitude];b.textContent="Ver por departamento";renderLocList();const f=ST.filter(mfOk).sort((a,c)=>km(near[0],near[1],a.la,a.lo)-km(near[0],near[1],c.la,c.lo))[0];if(f)pick(f.i,true)},()=>{b.textContent="No pudimos acceder a tu ubicación"},{timeout:10000,maximumAge:300000})};
@@ -1362,6 +1387,12 @@ function quizResult(a){store.set("voltio.quiz",a);const r=quizRank(a).slice(0,3)
  $("#xClose").onclick=closeSheet;$("#sheetCard").scrollTop=0;$("#qAgain").onclick=()=>openQuiz(0,{});if(r.length)$("#qShare").onclick=()=>shareWA(shareTxt);
  $("#sheetCard").querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>openCar(+b.dataset.open));
  $("#sheetCard").querySelectorAll("[data-quote]").forEach(b=>b.onclick=()=>quoteForm(CARS[+b.dataset.quote],()=>quizResult(a)))}
+let FOTOS={};try{FOTOS=JSON.parse(localStorage.getItem("kilowa.fotos1")||"{}")}catch(e){}
+const fesc=t=>String(t||"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+const fotoOf=c=>FOTOS[c.mk+"|"+c.md];
+const fotoImg=c=>{const f=fotoOf(c);return f?`<img class="ph" loading="lazy" decoding="async" src="${fesc(f.url)}" alt="${fesc(c.mk+" "+c.md)}" referrerpolicy="no-referrer">`:""};
+const fotoFig=c=>{const f=fotoOf(c);return f?`<figure class="fph"><img src="${fesc(f.url)}" alt="${fesc(c.mk+" "+c.md)}" referrerpolicy="no-referrer"><figcaption>Foto ilustrativa: ${fesc(f.autor||"Wikimedia Commons")} · ${fesc(f.licencia||"")} · <a href="${fesc(f.pagina)}" target="_blank" rel="noopener">Wikimedia Commons<\/a>. Puede no coincidir con la versión exacta.<\/figcaption><\/figure>`:""};
+function loadFotos(){fetch(SB_URL+"/rest/v1/fotos?select=k,url,pagina,autor,licencia",{headers:{apikey:SB_KEY}}).then(r=>r.ok?r.json():null).then(L=>{if(!Array.isArray(L))return;const o={};for(const x of L)if(/^https:\/\/(upload|thumb)\.wikimedia\.org\//.test(x.url))o[x.k]=x;FOTOS=o;try{localStorage.setItem("kilowa.fotos1",JSON.stringify(o))}catch(e){}if(typeof renderList==="function")renderList()}).catch(()=>{})}
 // Contacto de cada marca: email = Kilowá le reenvía el pedido sola; WhatsApp = el cliente lo manda con un toque (texto ya escrito)
 const EM0=["BYD","Geely","JAC","Lynk & Co","GAC","Chevrolet","Audi"],WA0={"MG":"59897782376","Leapmotor":"59892022804","Kia":"59893343674","Toyota":"59897439645"};
 function contactOf(mk){const O=window.OVR||{};const em=EM0.concat(Array.isArray(O.em)?O.em:[]);const wa=Object.assign({},WA0,O.wa&&typeof O.wa==="object"?O.wa:{});const n=String(wa[mk]||"").replace(/\D/g,"");return{em:em.includes(mk),wa:/^598\d{8}$/.test(n)?n:null}}
@@ -1391,7 +1422,7 @@ $("#cKm").addEventListener("input",()=>{$("#hKm").value=$("#cKm").value;renderHo
 document.addEventListener("click",e=>{const g=e.target.closest("[data-go]");if(!g)return;if(g.dataset.sort){$("#sort").value=g.dataset.sort;renderList()}show(g.dataset.go)});
 $("#infoBtn").onclick=()=>show("info");$("#hQuiz").onclick=()=>openQuiz(0,{});$("#catQuiz").onclick=()=>openQuiz(0,{});
 WATCH=store.get("voltio.watch",{});renderList();if(store.get("voltio.seg","autos")==="com")setSeg("com");renderAlerts();renderQuotes();updBadge();calc();trip();renderHome();const t0=store.get("voltio.tab","home");show(document.getElementById("v-"+t0)?t0:"home");
-track("visita");addEventListener("appinstalled",()=>track("instalada"));
+loadFotos();track("visita");addEventListener("appinstalled",()=>track("instalada"));
 {const p=new URLSearchParams(location.search),v=p.get("v"),a=p.get("auto");if(v&&document.getElementById("v-"+v))show(v);if(a){const c=CARS.find(x=>keyOf(x)===a||label(x)===a);if(c)openCar(c.id)}}
 if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{}));
 </script>
