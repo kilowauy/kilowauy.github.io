@@ -611,7 +611,7 @@ const RAW=[
 ["Deepal","S5","BEV",56.12,34990,"X",458,"NEDC"],["Deepal","S7","BEV",79.97,42990,"X",560,"NEDC"],
 ["Dongfeng","Nammi","330",31.4,18990,"u",330,"CLTC"],["Dongfeng","Nammi","330 EU",31.4,20990,"u",330,"CLTC"],["Dongfeng","Nammi","430 EU",42.3,22990,"u",430,"CLTC"],["Dongfeng","Vigo","E2",44.94,25990,"x",401,"CLTC"],["Dongfeng","Vigo","E2+",51.87,28990,"x",471,"CLTC"],
 ["Fiat","600e","—",54,37990,"x",420,"WLTP"],
-["Forthing","T5 Friday","Luxury",49.27,27990,"x",410,"CLTC"],["Forthing","S7","Luxury",57,34990,"s",540,"CLTC"],["Forthing","S7","Exclusive",57,38990,"s",540,"CLTC"],
+["Forthing","T5 Friday","Luxury",49.27,27490,"x",410,"CLTC"],["Forthing","S7","Luxury",57,34990,"s",540,"CLTC"],["Forthing","S7","Exclusive",57,38990,"s",540,"CLTC"],
 ["GAC","Aion UT","—",44.12,22490,"c",400,"NEDC"],["GAC","Aion UT","Max",60,25990,"c",512,"NEDC"],["GAC","Aion ES","—",55.2,26990,"s",442,"NEDC"],["GAC","Aion V","Plus",64.5,28990,"X",505,"NEDC"],["GAC","Aion V","Max",76.23,31990,"X",602,"NEDC"],["GAC","Hyptec HT","RWD",72.7,39990,"X",511,"NEDC"],
 ["Geely","EX2","Pro",39.4,20490,"c",395,"NEDC"],["Geely","EX2","Max",39.4,22490,"c",395,"NEDC"],["Geely","EX5","Urban",49.52,28990,"X",410,"NEDC"],["Geely","EX5","Pro",60.22,31990,"X",490,"NEDC"],["Geely","EX5","Max",60.22,35990,"X",495,"NEDC"],
 ["Hyundai","Ioniq 5","Safe Long Range",84,55990,"X",570,"WLTP"],["Hyundai","Ioniq 5","Limited Long Range",84,65990,"X",530,"WLTP"],["Hyundai","Ioniq 9","Ultimate RWD",110.3,79990,"L"],
@@ -978,7 +978,7 @@ const COMRAW=[
 ["BAW","Truck","Box",15.12,14490,"mini",{"src":"ab"}],
 ["Hudson","eBuddy","Pick-Up",15.4,13990,"mini",{"src":"ab"}],
 ["Hudson","eBuddy","Box",15.4,14490,"mini",{"src":"ab"}],
-["Victory","SCH1030D-BEV1","Pick-Up",41.86,29036,"mini",{"src":"ab"}],
+["Victory","SCH1030D-BEV1","Doble Cabina",41.86,28426,"mini",{"src":"wa"}],["Victory","SCH1030D-BEV1","Box",41.86,30378,"mini",{"src":"wa"}],
 ["Foton","E Wonder","Pick-Up",41.86,29950,"mini",{"src":"ab"}],
 ["Foton","E Wonder","Box",41.86,31950,"mini",{"src":"ab"}],
 ["Keyton","Q2 EV","Pick-Up",41.86,34770,"mini",{"src":"ab"}],
@@ -988,7 +988,7 @@ const COMRAW=[
 ["Bestune","NAT","Van",55,25490,"van",{"src":"ab"}],
 ["Karry","KQ53","Furgón EV",38.64,27990,"van",{"src":"ab"}],
 ["New Gonow","e-MCV","DM20",53.58,29500,"van",{"src":"ab"}],
-["Victory","SCH5032XXY-BEV4","Furgón",41.86,29890,"van",{"src":"ab"}],
+["Victory","SCH5032XXY-BEV4","Furgón",41.86,27328,"van",{"src":"wa"}],
 ["DFSK","EC35 EV","Van",38.7,33950,"van",{"src":"ab"}],
 ["New Gonow","e-LCV","SY00",53.58,35500,"van",{"src":"ab"}],
 ["Keyton","Q2 EV","Van",41.86,38490,"van",{"src":"ab"}],
@@ -1040,7 +1040,7 @@ const CC={mini:{g:"u",n:"Mini camión / pick-up chica",eff:15,l:8,f:"n",kmd:80,m
 const CG={u:"Utilitarios y furgones",c:"Camiones",b:"Buses y minibuses"};
 const COMI={"BAW":"Autoboulevard","Hudson":"Kaitazoff Motors","Victory":"Noderal","Foton":"Homero de León","Keyton":"Mobility","Bestune":"Kaitazoff Motors","Karry":"Grupo Sevel","New Gonow":"Noderal","DFSK":"Homero de León","Citroën":"Oversil","Peugeot":"AFSA-Sadar","Renault":"Santa Rosa","BYD":"Sadar","Farizon":"Santa Rosa","JAC":"Grupo Fiancar","Maxus":"Abriley","Mercedes-Benz":"Inchcape Uruguay","Yutong":"Buses del Sur / Pimatur"};
 const COMW={"BAW":"3 años o 50.000 km (Pony y Truck) · batería 5 años sin límite","Hudson":"2 años o 50.000 km · batería 5 años o 150.000 km","Victory":"2 años o 70.000 km · batería 5 años","Foton":"5 años o 150.000 km (3 años o 100.000 km en Wonder) · eléctricos: batería 5 años o 200.000 km","Keyton":"3 años o 100.000 km · batería 5 años o 100.000 km","Bestune":"NAT: 3 años o 150.000 km · batería 5 años o 400.000 km","Karry":"3 años o 100.000 km · batería 5 años o 200.000 km","New Gonow":"3 años o 70.000 km · batería 5 años o 200.000 km","DFSK":"Utilitarios eléctricos: 3 años o 60.000 km · batería 5 años o 120.000 km","Citroën":"3 años o 100.000 km · batería 8 años o 160.000 km","Peugeot":"3 años o 100.000 km · batería 8 años o 160.000 km","Renault":"3 años o 100.000 km","Farizon":"4 años o 100.000 km · batería 5 años o 200.000 km","JAC":"5 años o 150.000 km · batería 8 años o 150.000 km","Maxus":"3 años o 100.000 km · batería 8 años o 200.000 km","Mercedes-Benz":"2 años sin límite · batería 8 años o 160.000 km"};
-const CSRC={ab:"Lista de precios 0 km de Autoblog, 8/10/2026",tc:"Ficha publicada en Transporte Carretero (vendedor oficial)",eo:"Lanzamiento en El Observador, setiembre 2026",eu:"Relevamiento público de precios (electricosuruguay.com), octubre 2026"};
+const CSRC={wa:"Catálogo de WhatsApp del importador, octubre 2026",ab:"Lista de precios 0 km de Autoblog, 8/10/2026",tc:"Ficha publicada en Transporte Carretero (vendedor oficial)",eo:"Lanzamiento en El Observador, setiembre 2026",eu:"Relevamiento público de precios (electricosuruguay.com), octubre 2026"};
 const COM=COMRAW.map(([mk,md,vr,kwh,price,cat,x],i)=>{const k=CC[cat];const usable=kwh?kwh*.92:null;const rng=usable?Math.round(usable/k.eff*100*.95):null;
  return{cid:i,mk,md,vr:vr||"—",kwh,price,cat,x,k,rng,com:true,pay:x.pbt&&x.tara?x.pbt-x.tara:null}});
 let comG="",comBrand="";
