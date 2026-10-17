@@ -641,12 +641,16 @@ const RAW=[
 ["Wuling","Macaron","Youth",17.3,12490,"m"],["Wuling","Mini EV","—",26,13990,"m"],["Wuling","Binguo EV","—",37.9,18990,"u"],["Wuling","Bingo S","Signature",41.9,22990,"u"],
 ["Xpeng","G6","Air RWD",68.02,43990,"X"],["Xpeng","G6","Performance AWD",80.23,54990,"X"],["Xpeng","G9","Performance AWD",98,71990,"L"],
 ["Zeekr","X","Smart RWD",49,37990,"x"],["Zeekr","X","Premium RWD",69.05,46990,"x"],["Zeekr","X","Flagship AWD",69.05,51990,"x"],["Zeekr","7X","Core RWD",75,57990,"X"],["Zeekr","7X","Privilege AWD",100,69990,"X"],["Zeekr","001","Flagship AWD",100,79990,"s"],
+["GWM","Ora 03","Skin",47.8,23490,"c",310,"","Datos de relevamiento público (octubre 2026): confirmá versión y precio con el concesionario."],["GWM","Ora 5","Middle",58.3,24990,"x",435,"","Datos de relevamiento público (octubre 2026): confirmá versión y precio con el concesionario."],["GWM","Ora 5","High",58.3,26990,"x",435,"","Datos de relevamiento público (octubre 2026): confirmá versión y precio con el concesionario."],
+["Dongfeng","Mage EV","—",50.82,26990,"x",403,"","Datos de relevamiento público (octubre 2026): confirmá versión y precio con el concesionario."],["Omoda","5 EV","Desde",61,27990,"x",450,"","Datos de relevamiento público (octubre 2026): confirmá versión y precio con el concesionario."],["BYD","D1","GS",53.56,35490,"c",418,"","Datos de relevamiento público (octubre 2026): confirmá versión y precio con el concesionario."],
+["Arcfox","T5","—",65.7,35950,"x",475,"","Datos de relevamiento público (octubre 2026): confirmá versión y precio con el concesionario."],["Chery","eQ7","—",67.12,35990,"X",512,"","Datos de relevamiento público (octubre 2026): confirmá versión y precio con el concesionario."],["Hyundai","Kona Electric","Limited",48.4,49990,"x",377,"","Datos de relevamiento público (octubre 2026): confirmá versión y precio con el concesionario."],
+["BYD","Tang EV","EV530 GS AWD",108.8,80990,"L",530,"","Datos de relevamiento público (octubre 2026): confirmá versión y precio con el concesionario."],["Audi","RS e-tron GT","performance quattro",105,224000,"d",592,"","Datos de relevamiento público (octubre 2026): confirmá versión y precio con el concesionario."],
 ];
 if(window.OVR&&OVR.precios)RAW.forEach(r=>{const v=OVR.precios[r[0]+"|"+r[1]+"|"+r[2]];if(typeof v==="number"&&v>1000&&v<500000)r[4]=v});
 // Carga: [DC máx kW (0 = no tiene carga rápida), AC a bordo kW, tiempo declarado, conector, fuente l=UY i=internacional e=estimado]
 const CHG={
 "BYD|Seagull|EV300 GLi":[30,6.6,"30–80% en ≤30 min","CCS2","l"],"BYD|Seagull|EV380 GSi":[40,6.6,"30–80% en ≤30 min","CCS2","l"],
-"BYD|Seagull Surf":[85,11,"30–80% en ≤30 min","CCS2","l"],"BYD|New e2 X":[80,6.6,"","CCS2","l"],"BYD|Yuan Pro":[65,6.6,"0–100% en 69 min","CCS2","l"],
+"BYD|Seagull Surf":[85,11,"30–80% en ≤30 min","CCS2","l"],"BYD|New e2 X":[80,6.6,"","CCS2","l"],"BYD|Yuan Pro":[65,6.6,"0–100% en 69 min","CCS2","l"],"BAW|E7 Pro":[20,3.3,"Carga DC en ~60 min","CCS2","l"],
 "BYD|Yuan Plus":[80,7,"30–80% en 30 min","CCS2","l"],"BYD|Sealion Blue":[110,6.6,"","CCS2","l"],"BYD|Song Plus EV":[150,11,"0–100% en 60 min","CCS2","l"],
 "BYD|Sealion 7":[150,11,"10–80% en 32 min","CCS2","l"],"BYD|Seal":[150,6.6,"30–80% en ≤30 min","CCS2","l"],
 "Dongfeng|Nammi|330":[60,3.3,"0–80% en 30 min","CCS2","l"],"Dongfeng|Nammi|330 EU":[60,3.3,"0–80% en 30 min","CCS2","l"],"Dongfeng|Nammi|430 EU":[60,6.6,"0–80% en 40 min","CCS2","l"],
@@ -779,6 +783,8 @@ const HYB=[
 ["Volvo","XC60 T8","Plus AWD",18.8,94900,"X",73,"","P",0,0,0],["Volvo","XC90 T8","Plus AWD",18.8,129900,"L",81,"","P",0,0,0],
 ["Land Rover","Range Rover Velar P400e","R-Dynamic HSE",19.2,196900,"X",64,"","P",50,0,0],["Land Rover","Defender 110 P400e","X-Dynamic HSE",19.2,179900,"L",51,"","P",50,0,0],
 ["Porsche","Cayenne E-Hybrid","—",25.9,250100,"L",79,"WLTP","P",0,0,0],
+["Changan","Q05 PHEV","Elite",18.99,32990,"x",125,"","P",0,0,0],["Kaiyi","X7 PHEV","1.5T",22.48,34900,"X",150,"","P",0,0,0],["Chery","Tiggo 7 CSH","—",18.3,35990,"X",90,"","P",0,0,0],
+["BMW","X5 xDrive50e","—",29.5,188990,"L",94,"","P",0,0,0],["Mercedes-Benz","AMG C 63 S E Performance","—",6.1,214990,"s",13,"","P",0,0,0],["Mercedes-Benz","AMG GLC 63 S E Performance","—",6.1,229990,"X",13,"","P",0,0,0],
 ];
 const LCS={u:5,c:5.5,s:5.8,x:6,X:6.6,L:7.6,p:8.5,d:7};
 const CARS=RAW.map((r,i)=>{const [mk,md,vr,kwh,price,body,dec=0,cyc="",note=""]=r;const eff=EFF[body]+(kwh>95?1:0);const usable=kwh*.92;const rng=Math.round(usable/eff*100);
@@ -978,6 +984,7 @@ const COMRAW=[
 ["Keyton","Q2 EV","Pick-Up",41.86,34770,"mini",{"src":"ab"}],
 ["Keyton","Q2 EV","Box refrigerado",41.86,49900,"mini",{"src":"ab"}],
 ["BAW","MPV EV","Furgón",42,25990,"van",{"src":"ab"}],
+["BAW","V70 EV","Furgón",41.86,29900,"van",{"src":"eu"}],
 ["Bestune","NAT","Van",55,25490,"van",{"src":"ab"}],
 ["Karry","KQ53","Furgón EV",38.64,27990,"van",{"src":"ab"}],
 ["New Gonow","e-MCV","DM20",53.58,29500,"van",{"src":"ab"}],
@@ -1033,7 +1040,7 @@ const CC={mini:{g:"u",n:"Mini camión / pick-up chica",eff:15,l:8,f:"n",kmd:80,m
 const CG={u:"Utilitarios y furgones",c:"Camiones",b:"Buses y minibuses"};
 const COMI={"BAW":"Autoboulevard","Hudson":"Kaitazoff Motors","Victory":"Noderal","Foton":"Homero de León","Keyton":"Mobility","Bestune":"Kaitazoff Motors","Karry":"Grupo Sevel","New Gonow":"Noderal","DFSK":"Homero de León","Citroën":"Oversil","Peugeot":"AFSA-Sadar","Renault":"Santa Rosa","BYD":"Sadar","Farizon":"Santa Rosa","JAC":"Grupo Fiancar","Maxus":"Abriley","Mercedes-Benz":"Inchcape Uruguay","Yutong":"Buses del Sur / Pimatur"};
 const COMW={"BAW":"3 años o 50.000 km (Pony y Truck) · batería 5 años sin límite","Hudson":"2 años o 50.000 km · batería 5 años o 150.000 km","Victory":"2 años o 70.000 km · batería 5 años","Foton":"5 años o 150.000 km (3 años o 100.000 km en Wonder) · eléctricos: batería 5 años o 200.000 km","Keyton":"3 años o 100.000 km · batería 5 años o 100.000 km","Bestune":"NAT: 3 años o 150.000 km · batería 5 años o 400.000 km","Karry":"3 años o 100.000 km · batería 5 años o 200.000 km","New Gonow":"3 años o 70.000 km · batería 5 años o 200.000 km","DFSK":"Utilitarios eléctricos: 3 años o 60.000 km · batería 5 años o 120.000 km","Citroën":"3 años o 100.000 km · batería 8 años o 160.000 km","Peugeot":"3 años o 100.000 km · batería 8 años o 160.000 km","Renault":"3 años o 100.000 km","Farizon":"4 años o 100.000 km · batería 5 años o 200.000 km","JAC":"5 años o 150.000 km · batería 8 años o 150.000 km","Maxus":"3 años o 100.000 km · batería 8 años o 200.000 km","Mercedes-Benz":"2 años sin límite · batería 8 años o 160.000 km"};
-const CSRC={ab:"Lista de precios 0 km de Autoblog, 8/10/2026",tc:"Ficha publicada en Transporte Carretero (vendedor oficial)",eo:"Lanzamiento en El Observador, setiembre 2026"};
+const CSRC={ab:"Lista de precios 0 km de Autoblog, 8/10/2026",tc:"Ficha publicada en Transporte Carretero (vendedor oficial)",eo:"Lanzamiento en El Observador, setiembre 2026",eu:"Relevamiento público de precios (electricosuruguay.com), octubre 2026"};
 const COM=COMRAW.map(([mk,md,vr,kwh,price,cat,x],i)=>{const k=CC[cat];const usable=kwh?kwh*.92:null;const rng=usable?Math.round(usable/k.eff*100*.95):null;
  return{cid:i,mk,md,vr:vr||"—",kwh,price,cat,x,k,rng,com:true,pay:x.pbt&&x.tara?x.pbt-x.tara:null}});
 let comG="",comBrand="";
@@ -1261,7 +1268,7 @@ function trip(){const c=CARS[+$("#tCar").value];const oI=+$("#tOrig").value,dI=+
  const per=c.eff*1.22/100;const first=c.usable*.9/per;const leg=c.usable*.7/per;
  const A=[CITY[oI][1],CITY[oI][2]],B=[CITY[dI][1],CITY[dI][2]];
  const RG=routeOf(oI,dI),RB=routeOf(dI,oI);const attempt=L=>{const pl=[];let r=planRoute(RG,first,L,pl);const o=pl.length;if(r!==null&&rt)r=planRoute(RB,r,L,pl);return{pl,r,o}};
- let at=attempt(leg),hi=false;if(at.r===null&&c.dc){const a2=attempt(c.usable*.85/per);if(a2.r!==null){at=a2;hi=true}}
+ let at=attempt(leg),hi=false;if(at.r===null&&c.dc){const a2=attempt(c.usable*.85/per);if(a2.r!==null){at=a2;hi=true}}else if(c.dc&&at.pl.length>=2){const a2=attempt(c.usable*.85/per);if(a2.r!==null&&a2.pl.length<at.pl.length){at=a2;hi=true}}
  const plan=at.pl,outN=at.o;let rem=at.r;
  const mins=dcMin(c,kw);
  if(rem===null||(plan.length&&!c.dc)){$("#tOut").innerHTML=`<div class="big" style="color:var(--bad)">No llega<\/div><p>${!c.dc?`${label(c)} no tiene carga rápida y su alcance en ruta es de ~${Math.round(first)} km: para este viaje tendrías que parar varias horas en un punto lento.`:`Con ${label(c)} (alcance en ruta ~${Math.round(first)} km) no encontramos una cadena de cargadores rápidos de UTE que llegue de ${on} a ${dn}${rt?" y vuelva":""}. Probá con un auto de más autonomía o cargando en un punto lento por el camino.`}<\/p>`;return}
@@ -1270,7 +1277,7 @@ function trip(){const c=CARS[+$("#tCar").value];const oI=+$("#tOrig").value,dI=+
   legs.push(`<div class="leg"><i class="c n">${k+1}<\/i><span>Parada ${k+1}: <b>${p.st.name}<\/b> (${p.st.city}, ${p.st.dc} kW) · ~${mins} min hasta 80%<br><small>${p.st.addr} · ~${Math.round(p.km)} km desde ${k===0?on:(rt&&k===outN)?dn:"la parada anterior"}<\/small><\/span><\/div>`)});
  if(rt&&outN===plan.length)legs.push(`<div class="leg"><i><\/i><span>Llegás a ${dn} y emprendés la vuelta<\/span><\/div>`);
  legs.push(`<div class="leg"><i><\/i><span>Llegás a ${rt?on:dn}<\/span><\/div>`);
- const hiN=hi?`<p class="note"><b>Ojo:<\/b> en algún tramo no alcanza con cargar hasta 80%: tenés que cargar hasta ~95% en esa parada. Arriba del 80% la carga es más lenta, así que sumá 15–25 minutos.<\/p>`:"";
+ const hiN=hi?`<p class="note"><b>Ojo:<\/b> para hacer menos paradas, en algún tramo cargás hasta ~95% en vez de 80%. Arriba del 80% la carga es más lenta, así que sumá 15–25 minutos.<\/p>`:"";
  const cap=c.dc&&c.dc<kw?`<p class="note">El auto carga a ${c.dc} kW como máximo, así que un cargador más potente no lo acelera.<\/p>`:"";
  $("#tOut").innerHTML=`<div class="big" style="color:${stops?"var(--warn)":"var(--good)"}">${stops?stops+(stops>1?" paradas":" parada"):"Llegás sin cargar"}<\/div>${tripMap(oI,dI,plan,outN,rt)}
  <div class="grid2"><div class="kv"><span>Distancia<\/span><b>~${d} km<\/b><\/div><div class="kv"><span>Alcance en ruta (100→10%)<\/span><b>${Math.round(first)} km<\/b><\/div><div class="kv"><span>Manejando<\/span><b>${(m=>Math.floor(m/60)+" h "+String(m%60).padStart(2,"0"))(Math.round((RG?RG.min:d0/80*60)*(rt?2:1)))}<\/b><small>+ ${stops*mins} min cargando<\/small><\/div><div class="kv"><span>Costo en cargadores UTE<\/span><b>${fmtP(cost)}<\/b><\/div><\/div>
