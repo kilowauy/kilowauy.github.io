@@ -1400,7 +1400,7 @@ function quizResult(a){store.set("voltio.quiz",a);const r=quizRank(a).slice(0,3)
  $("#sheetCard").querySelectorAll("[data-quote]").forEach(b=>b.onclick=()=>quoteForm(CARS[+b.dataset.quote],()=>quizResult(a)))}
 let FOTOS={};try{FOTOS=JSON.parse(localStorage.getItem("kilowa.fotos1")||"{}")}catch(e){}
 const fesc=t=>String(t||"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
-const fotoOf=c=>FOTOS[c.mk+"|"+c.md];
+const fotoOf=c=>FOTOS[c.mk+"|"+c.md+"|"+c.vr]||FOTOS[c.mk+"|"+c.md];
 const fotoImg=c=>{const f=fotoOf(c);return f?`<img class="ph" loading="lazy" decoding="async" src="${fesc(f.url)}" alt="${fesc(c.mk+" "+c.md)}" referrerpolicy="no-referrer">`:""};
 const fotoFig=c=>{const f=fotoOf(c);return f?`<figure class="fph"><img src="${fesc(f.url)}" alt="${fesc(c.mk+" "+c.md)}" referrerpolicy="no-referrer"><figcaption>${f.url.startsWith("/img/")?`Foto: ${fesc(f.autor||"importador")}${f.licencia?" · "+fesc(f.licencia):""}.`:`Foto ilustrativa: ${fesc(f.autor||"Wikimedia Commons")} · ${fesc(f.licencia||"")} · <a href="${fesc(f.pagina)}" target="_blank" rel="noopener">Wikimedia Commons<\/a>. Puede no coincidir con la versión exacta.`}<\/figcaption><\/figure>`:""};
 function loadFotos(){fetch(SB_URL+"/rest/v1/fotos?select=k,url,pagina,autor,licencia",{headers:{apikey:SB_KEY}}).then(r=>r.ok?r.json():null).then(L=>{if(!Array.isArray(L))return;const o={};for(const x of L)if(/^https:\/\/(upload|thumb)\.wikimedia\.org\//.test(x.url)||/^\/img\/[\w.-]+\.(jpg|png|webp)$/.test(x.url))o[x.k]=x;FOTOS=o;try{localStorage.setItem("kilowa.fotos1",JSON.stringify(o))}catch(e){}if(typeof renderList==="function")renderList();if(typeof renderCom==="function"&&$("#comBox")&&!$("#comBox").hidden)renderCom()}).catch(()=>{})}
