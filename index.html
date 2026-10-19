@@ -396,7 +396,7 @@ nav.tabs button[data-v="info"]{display:none}
 <section class="view" id="v-trip" hidden>
   <div class="panel">
     <h2>¿Llego sin cargar?</h2>
-    <p>Salida con batería al 100%. Ruta a ~90–110 km/h. Llegás con 10% de reserva y en cada parada cargás hasta 80%.</p>
+    <p>Salida con batería al 100%. Ruta a ~90–100 km/h. Llegás con 10% de reserva y en cada parada cargás hasta 80%.</p>
     <div class="grid2">
       <label class="range">Auto<select id="tCar"></select></label>
       <label class="range">Origen<select id="tOrig"></select></label>
@@ -535,7 +535,7 @@ nav.tabs button[data-v="info"]{display:none}
     <h2>Cómo calculamos</h2>
     <ul class="clean">
       <li><b>Autonomía real</b>: batería × 92% útil ÷ consumo típico de su tamaño (13 a 20 kWh/100 km). Es más baja que la NEDC/CLTC que publican las marcas, a propósito.</li>
-      <li><b>En ruta</b>: el consumo sube ~15% a 90–100 km/h (calibrado con viajes reales de usuarios; a 110 km/h o más, contá con más).</li>
+      <li><b>En ruta</b>: a 90–100 km/h el consumo sube ~5% sobre el real mixto (calibrado con viajes reales de usuarios). A 110–130 km/h sube mucho más: contá con 20–40% menos de alcance.</li>
       <li><b>Carga rápida 10–80%</b>: la potencia promedio es ~75% del pico del auto (~60% si el pico supera 150 kW), limitada por el cargador. Etiquetas: <span class="src l">UY</span> ficha del lanzamiento en Uruguay, <span class="src">INT</span> ficha de fábrica internacional, <span class="src e">EST</span> estimado por tamaño de batería.</li>
       <li><b>Híbridos enchufables</b>: autonomía eléctrica real con 90% de la batería y un consumo 2 kWh/100 km mayor que un eléctrico del mismo tamaño (cargan más peso). Con carga diaria, la parte eléctrica cubre hasta esa distancia por día y el resto va a nafta, con el consumo que declara la marca en modo híbrido o uno estimado por tamaño (5–8,5 L/100 km).</li>
       <li><b>Mantenimiento</b>: services según el intervalo de cada marca (mínimo uno por año). Si la marca no publica precio, estimamos por tamaño del auto ($5.000–13.000) y US$ 400 en marcas premium. Cubiertas cada 40.000 km en eléctricos y 50.000 km a nafta; pastillas cada 100.000 km en eléctricos y 40.000 km a nafta; batería de 12 V cada 4 años. La red de talleres se califica según los puntos oficiales publicados por cada marca.</li>
@@ -734,7 +734,7 @@ const insRate=p=>p<25000?.04:p<50000?.036:.032;
 const insYear=(price,y=0)=>Math.max(450,Math.round(price*Math.pow(.9,y)*insRate(price)));
 const insurance=(price,years)=>{let s=0;for(let i=0;i<years;i++)s+=insYear(price,i);return s};
 // Fecha de cada fuente de datos
-const DATES={price:"14/10/2026",ute:"14/10/2026",svcOfficial:"8/10/2026",ins:"8/10/2026",imesi:"Decreto 2026, rige desde 2027"};
+const DATES={price:"19/10/2026",ute:"14/10/2026",svcOfficial:"8/10/2026",ins:"8/10/2026",imesi:"Decreto 2026, rige desde 2027"};
 // Seguimiento de precios (en este dispositivo): {clave:{p:precio al seguir, d:fecha}}
 const keyOf=c=>c.mk+"|"+c.md+"|"+c.vr;
 let WATCH={};
@@ -789,7 +789,7 @@ const HYB=[
 const LCS={u:5,c:5.5,s:5.8,x:6,X:6.6,L:7.6,p:8.5,d:7};
 const CARS=RAW.map((r,i)=>{const [mk,md,vr,kwh,price,body,dec=0,cyc="",note=""]=r;const eff=EFF[body]+(kwh>95?1:0);const usable=kwh*.92;const rng=Math.round(usable/eff*100);
  const [dc,ac,decl,conn,src]=chgFor(mk,md,vr,kwh,body);
- const c={id:i,mk,md,vr,kwh,price,body,dec,cyc,note,eff,usable,rng,hw:Math.round(usable/(eff*1.15)*100),kmusd:Math.round(rng/price*1000*10)/10,top:TOP[mk+"|"+md]||0,imesi:price<=28000?0:price<=40000?5:9,dc,ac,decl,conn,src};
+ const c={id:i,mk,md,vr,kwh,price,body,dec,cyc,note,eff,usable,rng,hw:Math.round(usable/(eff*1.05)*100),kmusd:Math.round(rng/price*1000*10)/10,top:TOP[mk+"|"+md]||0,imesi:price<=28000?0:price<=40000?5:9,dc,ac,decl,conn,src};
  c.post=postFor(c);c.m5=sum(maint(c,15000,5));c.m5i=sum(maintICE(c,15000,5));
  c.t60=dcMin(c,60);c.tmax=dcMin(c,480);c.kmh=c.dc?Math.round(Math.min(c.dc,60)*.75/c.eff*100):0;c.acH=c.ac?Math.round(c.usable/(c.ac*.9)*10)/10:null;c.type="E";c.total=c.rng;c.patR=.03;return c});
 HYB.forEach(r=>{const [mk,md,vr,kwh,price,body,evr,cyc,type,dc,comb,lc]=r;const eff=EFF[body]+2+(PREMIUM.includes(mk)?1:0);const usable=kwh*.9;const rng=Math.round(usable/eff*100);
@@ -1265,7 +1265,7 @@ function trip(){const c=CARS[+$("#tCar").value];const oI=+$("#tOrig").value,dI=+
   <div class="grid2"><div class="kv"><span>Distancia<\/span><b>~${d} km<\/b>${routeOf(oI,dI)?`<small>~${(m=>Math.floor(m/60)+" h "+String(m%60).padStart(2,"0"))(Math.round(routeOf(oI,dI).min*(rt?2:1)))} manejando<\/small>`:""}<\/div><div class="kv"><span>Con batería<\/span><b>~${Math.round(evKm)} km<\/b><\/div><div class="kv"><span>A nafta<\/span><b>~${Math.round(fuelKm)} km<\/b><small>~${Math.round(lt)} litros<\/small><\/div><div class="kv"><span>Nafta del viaje<\/span><b>${fmtP(cost)}<\/b><\/div><\/div>
   <p>${label(c)} sale con la batería llena, usa ~${c.hw} km eléctricos en ruta y sigue a nafta. Si cargás en destino, la vuelta arranca otra vez en eléctrico.<\/p>
   <p class="note">Consumo a nafta en ruta estimado en ${(c.lcs*1.1).toFixed(1).replace(".",",")} L/100 km con batería descargada. Súper 95 a $90,45.<\/p>`;return}
- const per=c.eff*1.15/100;const first=c.usable*.9/per;const leg=c.usable*.7/per;
+ const per=c.eff*1.05/100;const first=c.usable*.9/per;const leg=c.usable*.7/per;
  const A=[CITY[oI][1],CITY[oI][2]],B=[CITY[dI][1],CITY[dI][2]];
  const RG=routeOf(oI,dI),RB=routeOf(dI,oI);const attempt=L=>{const pl=[];let r=planRoute(RG,first,L,pl);const o=pl.length;if(r!==null&&rt)r=planRoute(RB,r,L,pl);return{pl,r,o}};
  let at=attempt(leg),hi=false;if(at.r===null&&c.dc){const a2=attempt(c.usable*.85/per);if(a2.r!==null){at=a2;hi=true}}else if(c.dc&&at.pl.length>=2){const a2=attempt(c.usable*.85/per);if(a2.r!==null&&a2.pl.length<at.pl.length){at=a2;hi=true}}
