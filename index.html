@@ -311,6 +311,88 @@ nav.tabs button[data-v="info"]{display:none}
   #v-info{columns:3}
 }
 @media (min-width:1100px) and (prefers-reduced-motion:no-preference){.sheet .card{animation:side .22s ease-out}@keyframes side{from{transform:translateX(40px);opacity:.6}}}
+
+/* ===== V2UI · rediseño 2026-10 ===== */
+:root{--bg:#0B100E;--surface:#131A16;--sunk:#1A231E;--line:#1F2A24;--r:20px}
+body{padding-bottom:calc(108px + env(safe-area-inset-bottom,0px))}
+header.top{padding-block:20px 6px}
+/* barra flotante */
+nav.tabs{left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));border-radius:24px;background:rgba(19,26,22,.88);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1px solid #24312B;padding:7px;gap:2px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+nav.tabs button{padding:7px 0;border-radius:16px;font-size:.66rem;transition:background .15s,color .15s}
+nav.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+nav.tabs .badge{top:0}
+/* controles */
+.search input,select,.inp{border-radius:14px}
+.search input{height:50px;padding:0 16px;font-size:1rem}
+.chip{height:38px;padding:0 16px;font-size:.88rem;display:inline-flex;align-items:center;background:transparent}
+.chip[aria-pressed="true"]{font-weight:600}
+.btn{border-radius:14px;min-height:44px}
+.panel{border-radius:var(--r);border-color:var(--line)}
+.seg{border-radius:14px;background:var(--surface);border:1px solid var(--line)}
+.seg button{border-radius:11px;min-height:40px}
+.seg button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
+/* tarjetas de autos: foto chica a la izquierda en el celular */
+.car{border-radius:18px;padding:12px;border-color:var(--line);transition:border-color .15s,transform .15s}
+.car .pr{color:var(--fg)}
+.bar{height:6px;border-radius:3px;background:#24312B}
+.bar i{background:var(--accent);border-radius:3px}
+@media (max-width:767px){
+  .list .car:has(.ph){grid-template-columns:96px minmax(0,1fr) auto;column-gap:12px}
+  .list .car .ph{grid-column:1;grid-row:1;width:96px;height:68px;aspect-ratio:auto;margin:0;border-radius:12px;align-self:center}
+}
+@media (hover:hover){.car:hover{transform:translateY(-1px)}}
+/* inicio */
+.hhero{display:grid;gap:14px;padding-top:4px}
+.hhero h2{font-size:2rem;line-height:1.06;letter-spacing:-.03em;font-weight:700}
+.hsearch{display:flex;align-items:center;gap:10px;height:54px;padding:0 16px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
+.hsearch:focus-within{border-color:var(--accent)}
+.hsearch input{flex:1;min-width:0;background:transparent;border:0;outline:none;font-size:1rem;color:var(--fg)}
+.hcta{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:16px;border:0;border-radius:20px;background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.hcta b{display:block;font-size:1.06rem}.hcta small{display:block;font-size:.82rem;opacity:.8;margin-top:2px}
+.hcta .go{margin-left:auto;width:42px;height:42px;border-radius:13px;background:var(--accent-ink);color:var(--accent);display:grid;place-items:center;flex:none}
+.qa{border-radius:18px;border-color:var(--line)}
+.topr{grid-template-columns:22px 72px minmax(0,1fr) auto;border:1px solid var(--line);border-radius:18px;padding:10px 12px}
+.topr .tth{width:72px;height:50px;border-radius:10px;object-fit:cover;background:var(--sunk);display:block}
+.topr .tth.ini{display:grid;place-items:center;font:700 1.1rem var(--display);color:var(--muted)}
+.topr .tb i{background:var(--accent)}
+.hsave{order:9}
+/* banner del test */
+.qbanner{border:0;border-radius:20px;background:var(--accent);color:var(--accent-ink)}
+.qbanner small{color:var(--accent-ink);opacity:.8}.qbanner .num{color:var(--accent-ink)}
+/* ficha: foto grande arriba, de borde a borde */
+.sheet{background:rgba(3,7,5,.6)}
+.sheet .card{border-radius:24px 24px 0 0}
+.sheet .card>.fph{order:-1;margin:-18px -16px 0;position:relative}
+.sheet .card>.fph img{aspect-ratio:16/10;border-radius:24px 24px 0 0}
+.sheet .card>.fph::after{content:"";position:absolute;left:0;right:0;bottom:0;height:40%;background:linear-gradient(180deg,rgba(11,16,14,0),var(--bg));pointer-events:none}
+.sheet .card>.fph figcaption{position:absolute;right:12px;top:12px;max-width:70%;background:rgba(11,16,14,.72);padding:4px 10px;border-radius:10px;z-index:1}
+.sheet .card>.fph~.hd{margin-top:-46px;position:relative;z-index:1}
+.sheet .big{color:var(--accent)}
+.ks{border-radius:16px}
+.own{border-radius:20px}
+.actbar .btn{border-radius:16px}
+/* viaje: paradas como línea de tiempo */
+.legs{gap:0}
+.leg{position:relative;padding-bottom:16px;align-items:flex-start}
+.leg i,.leg i.n{width:22px;height:22px;display:grid;place-items:center;font:700 .7rem var(--mono);color:var(--accent-ink)}
+.leg:not(:last-child)::before{content:"";position:absolute;left:10px;top:24px;bottom:2px;border-left:2px dashed var(--sol);opacity:.8}
+#tOut .grid2 .kv{background:var(--sunk);border-radius:16px;padding:12px}
+#tOut .grid2 .kv:first-child{background:var(--accent);color:var(--accent-ink)}
+#tOut .grid2 .kv:first-child span{color:var(--accent-ink);opacity:.75}
+@media (min-width:768px){
+  nav.tabs{left:0;right:auto;top:0;bottom:0;border-radius:0;box-shadow:none;border:0;border-right:1px solid var(--line);background:#0B0F0D;padding:84px 8px 16px}
+  body{padding-bottom:32px}
+  .sheet .card{border-radius:24px}
+  .sheet .card>.fph{margin:-22px -24px 0}
+  .sheet .card>.fph img{border-radius:24px 24px 0 0}
+  .hhero h2{font-size:2.6rem}
+}
+@media (min-width:1100px){
+  nav.tabs{padding:96px 14px 16px}
+  .sheet .card{border-radius:0}
+  .sheet .card>.fph{margin:-24px -28px 0}
+  .sheet .card>.fph img{border-radius:0}
+}
 </style>
 </head>
 <body>
@@ -320,10 +402,12 @@ nav.tabs button[data-v="info"]{display:none}
     <svg width="36" height="36" viewBox="0 0 34 34" aria-hidden="true"><rect x="1" y="1" width="32" height="32" rx="9" fill="var(--accent)"/><path d="M11 8v18M11 17l9-9M14 15l8 11" stroke="var(--accent-ink)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <div><h1>kilowá</h1><small>Eléctricos en Uruguay</small></div>
   </div>
-  <div class="row" style="gap:10px;flex-wrap:nowrap"><div class="stamp">DATOS AL<br>14·10·2026</div><button class="ibtn" id="infoBtn" aria-label="Información y fuentes" title="Información y fuentes"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v6M12 7.5v.5"/></svg></button></div>
+  <div class="row" style="gap:10px;flex-wrap:nowrap"><div class="stamp" id="stamp">DATOS AL<br>14·10·2026</div><button class="ibtn" id="infoBtn" aria-label="Información y fuentes" title="Información y fuentes"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v6M12 7.5v.5"/></svg></button></div>
 </header>
 
 <section class="view" id="v-home">
+  <div class="hhero"><h2>¿Qué eléctrico<br>te conviene?</h2><form class="hsearch" id="hSearch" role="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="hQ" type="search" placeholder="Buscar marca o modelo" aria-label="Buscar marca o modelo" enterkeyhint="search"></form></div>
+  <button class="hcta" id="hQuiz"><span><b>Test de 5 preguntas</b><small>Te mostramos los 3 que mejor te quedan</small></span><span class="go" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
   <div class="panel hsave">
     <div class="eyebrow">¿Cuánto ahorrarías?</div>
     <div class="hbig"><b class="num" id="hSave">—</b><span>por mes</span></div>
@@ -331,12 +415,12 @@ nav.tabs button[data-v="info"]{display:none}
     <p class="hnote" id="hNote"></p>
   </div>
   <div class="qgrid">
-    <button class="qa" id="hQuiz"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><b>¿Cuál me conviene?</b><small>Test de 5 preguntas</small></button>
+    <button class="qa" data-go="cost"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 3v18M17 7H9.5a3 3 0 0 0 0 6h5a3 3 0 0 1 0 6H6"/></svg><b>¿Cuánto ahorro?</b><small>Con tu tarifa de UTE</small></button>
     <button class="qa" data-go="cmp"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sol)" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h12l-3-3M20 17H8l3 3"/></svg><b>Compará dos</b><small>Con veredicto</small></button>
     <button class="qa" data-go="trip"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sol)" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 18c3 0 4-3 8-3s5 3 8 3M6 14V6l6 3 6-3v8"/></svg><b>Planeá un viaje</b><small>Paradas en cargadores reales</small></button>
     <button class="qa" data-go="map"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M13 3L5 14h6l-1 7 8-11h-6z"/></svg><b>Cargadores</b><small id="hSt">Mapa de UTE</small></button>
   </div>
-  <div class="row" style="justify-content:space-between;align-items:baseline;padding:4px 4px 0"><div class="eyebrow">Más vendidos 2025</div><button class="lnk" data-go="cat" data-sort="top">Ver ranking</button></div>
+  <div class="row" style="justify-content:space-between;align-items:baseline;padding:4px 4px 0"><div class="eyebrow">Más elegidos</div><button class="lnk" data-go="cat" data-sort="top">Ver ranking</button></div>
   <div class="tops" id="hTop"></div>
 </section>
 
@@ -1403,7 +1487,7 @@ const fesc=t=>String(t||"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&
 const fotoOf=c=>FOTOS[c.mk+"|"+c.md+"|"+c.vr]||FOTOS[c.mk+"|"+c.md];
 const fotoImg=c=>{const f=fotoOf(c);return f?`<img class="ph" loading="lazy" decoding="async" src="${fesc(f.url)}" alt="${fesc(c.mk+" "+c.md)}" referrerpolicy="no-referrer">`:""};
 const fotoFig=c=>{const f=fotoOf(c);return f?`<figure class="fph"><img src="${fesc(f.url)}" alt="${fesc(c.mk+" "+c.md)}" referrerpolicy="no-referrer"><figcaption>${f.url.startsWith("/img/")?`Foto: ${fesc(f.autor||"importador")}${f.licencia?" · "+fesc(f.licencia):""}.`:`Foto ilustrativa: ${fesc(f.autor||"Wikimedia Commons")} · ${fesc(f.licencia||"")} · <a href="${fesc(f.pagina)}" target="_blank" rel="noopener">Wikimedia Commons<\/a>. Puede no coincidir con la versión exacta.`}<\/figcaption><\/figure>`:""};
-function loadFotos(){fetch(SB_URL+"/rest/v1/fotos?select=k,url,pagina,autor,licencia",{headers:{apikey:SB_KEY}}).then(r=>r.ok?r.json():null).then(L=>{if(!Array.isArray(L))return;const o={};for(const x of L)if(/^https:\/\/(upload|thumb)\.wikimedia\.org\//.test(x.url)||/^\/img\/[\w.-]+\.(jpg|png|webp)$/.test(x.url))o[x.k]=x;FOTOS=o;try{localStorage.setItem("kilowa.fotos1",JSON.stringify(o))}catch(e){}if(typeof renderList==="function")renderList();if(typeof renderCom==="function"&&$("#comBox")&&!$("#comBox").hidden)renderCom()}).catch(()=>{})}
+function loadFotos(){fetch(SB_URL+"/rest/v1/fotos?select=k,url,pagina,autor,licencia",{headers:{apikey:SB_KEY}}).then(r=>r.ok?r.json():null).then(L=>{if(!Array.isArray(L))return;const o={};for(const x of L)if(/^https:\/\/(upload|thumb)\.wikimedia\.org\//.test(x.url)||/^\/img\/[\w.-]+\.(jpg|png|webp)$/.test(x.url))o[x.k]=x;FOTOS=o;try{localStorage.setItem("kilowa.fotos1",JSON.stringify(o))}catch(e){}if(typeof renderList==="function")renderList();if(typeof renderHome==="function")try{renderHome()}catch(e){}if(typeof renderCom==="function"&&$("#comBox")&&!$("#comBox").hidden)renderCom()}).catch(()=>{})}
 // Contacto de cada marca: email = Kilowá le reenvía el pedido sola; WhatsApp = el cliente lo manda con un toque (texto ya escrito)
 const EM0=["BYD","Geely","JAC","Lynk & Co","GAC","Chevrolet","Audi"],WA0={"MG":"59897782376","Leapmotor":"59892022804","Kia":"59893343674","Toyota":"59897439645"};
 function contactOf(mk){const O=window.OVR||{};const em=EM0.concat(Array.isArray(O.em)?O.em:[]);const wa=Object.assign({},WA0,O.wa&&typeof O.wa==="object"?O.wa:{});const n=String(wa[mk]||"").replace(/\D/g,"");return{em:em.includes(mk),wa:/^598\d{8}$/.test(n)?n:null}}
@@ -1425,13 +1509,14 @@ function renderHome(){const c=CARS[+$("#cCar").value];if(!c)return;const km=+$("
  $("#hNote").innerHTML=`${c.mk} ${c.md} cargando ${Math.round(home*100)}% en casa vs. un auto a nafta de ${String(L).replace(".",",")} L/100 km. <b>${fmtU(Math.round(save*60/usd))} en 5 años.<\/b> <button class="lnk" data-go="cost">Cambiar auto o tarifa<\/button>`;
  $("#hSt").textContent=ST.length+" estaciones UTE";
  const tops=Object.entries(TOP).sort((a,b)=>a[1]-b[1]).slice(0,5).map(([k,n])=>{const vs=CARS.filter(c=>c.mk+"|"+c.md===k);if(!vs.length)return"";const ch=vs.reduce((a,b)=>b.price<a.price?b:a),mr=Math.max(...vs.map(v=>v.rng));
-  return`<button class="topr" data-open="${ch.id}"><span class="num tn">${n}<\/span><span class="tm"><b>${ch.mk} ${ch.md}<\/b><i class="tb"><i style="width:${Math.min(100,Math.round(mr/500*100))}%"><\/i><\/i><\/span><span class="num tp">${vs.length>1?"<small>desde<\/small> ":""}${fmtU(ch.price)}<small>${mr} km reales<\/small><\/span><\/button>`}).join("");
+  const _f=typeof fotoOf==="function"?fotoOf(ch):null;
+  return`<button class="topr" data-open="${ch.id}"><span class="num tn">${n}<\/span>${_f?`<img class="tth" loading="lazy" src="${fesc(_f.url)}" alt="" referrerpolicy="no-referrer">`:`<span class="tth ini" aria-hidden="true">${ch.mk[0]}<\/span>`}<span class="tm"><b>${ch.mk} ${ch.md}<\/b><i class="tb"><i style="width:${Math.min(100,Math.round(mr/500*100))}%"><\/i><\/i><\/span><span class="num tp">${vs.length>1?"<small>desde<\/small> ":""}${fmtU(ch.price)}<small>${mr} km reales<\/small><\/span><\/button>`}).join("");
  $("#hTop").innerHTML=tops;$("#hTop").querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>openCar(+b.dataset.open))}
 $("#hKm").addEventListener("input",()=>{$("#cKm").value=$("#hKm").value;renderHome();calc()});
 $("#cKm").addEventListener("input",()=>{$("#hKm").value=$("#cKm").value;renderHome()});
 ["cCar","cHome","cTar","cL","cNafta","cUsd"].forEach(id=>$("#"+id).addEventListener("input",renderHome));
 document.addEventListener("click",e=>{const g=e.target.closest("[data-go]");if(!g)return;if(g.dataset.sort){$("#sort").value=g.dataset.sort;renderList()}show(g.dataset.go)});
-$("#infoBtn").onclick=()=>show("info");$("#hQuiz").onclick=()=>openQuiz(0,{});$("#catQuiz").onclick=()=>openQuiz(0,{});
+try{$("#stamp").innerHTML="DATOS AL<br>"+DATES.price.replace(/\//g,"·")}catch(e){}$("#hSearch").onsubmit=e=>{e.preventDefault();$("#q").value=$("#hQ").value.trim();renderList();show("cat")};$("#infoBtn").onclick=()=>show("info");$("#hQuiz").onclick=()=>openQuiz(0,{});$("#catQuiz").onclick=()=>openQuiz(0,{});
 WATCH=store.get("voltio.watch",{});renderList();if(store.get("voltio.seg","autos")==="com")setSeg("com");renderAlerts();renderQuotes();updBadge();calc();trip();renderHome();const t0=store.get("voltio.tab","home");show(document.getElementById("v-"+t0)?t0:"home");
 loadFotos();track("visita");addEventListener("appinstalled",()=>track("instalada"));
 {const p=new URLSearchParams(location.search),v=p.get("v"),a=p.get("auto");if(v&&document.getElementById("v-"+v))show(v);if(a){const c=CARS.find(x=>keyOf(x)===a||label(x)===a);if(c)openCar(c.id)}}
