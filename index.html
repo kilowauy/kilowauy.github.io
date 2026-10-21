@@ -508,6 +508,7 @@ nav.tabs .badge{top:0}
 </section>
 
 <section class="view" id="v-info" hidden>
+  <div class="panel"><h2>Privacidad</h2><p>Kilowá no usa cookies ni pide registrarse. Para saber cuánta gente la usa, contamos visitas y fichas abiertas de forma anónima, con un número al azar que queda guardado solo en tu navegador. No guardamos tu nombre, tu ubicación ni tu IP. Los datos que escribís al pedir una cotización se usan únicamente para pasárselos al concesionario.</p></div>
   <div class="panel">
     <h2>Cargar en la vía pública (UTE)</h2>
     <p><span class="uteTot"></span>. Precios con IVA, vigentes en 2026. Desde enero se eliminó el 30% de descuento para particulares.</p>
@@ -1498,7 +1499,8 @@ function nextStep(c,d,pick){const k=contactOf(c.mk),via=pick.via==="wa"?"WhatsAp
  return "Guardamos tu pedido. "+esc(c.mk)+" atiende las consultas desde su web oficial: contactalos y contales que venís de Kilowá."+`<div style="margin-top:10px"><a class="btn" href="https://www.google.com/search?q=${encodeURIComponent(c.mk+" Uruguay concesionario oficial contacto")}" target="_blank" rel="noopener">Buscar el concesionario de ${esc(c.mk)}<\/a><\/div>`}
 const SB_URL="https://vigvzprxnlxvizjglopp.supabase.co",SB_KEY="sb_publishable_tucMmW6_4JK5zBoVIyDNzA_jTqP7k2Z";
 function sbInsert(t,row){return fetch(SB_URL+"/rest/v1/"+t,{method:"POST",headers:{apikey:SB_KEY,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify(row),keepalive:true}).then(r=>r.ok).catch(()=>false)}
-function track(evento,auto){try{if(/localhost|127\.0\.0\.1/.test(location.hostname))return;sbInsert("visitas",{evento,auto:auto?String(auto).slice(0,120):null,pagina:(location.pathname+((r=>r?"?ref="+r.replace(/[^a-z0-9_-]/gi,"").slice(0,20):"")(new URLSearchParams(location.search).get("ref")))).slice(0,60)})}catch(e){}}
+function kvid(){try{let v=localStorage.getItem("kilowa.vid");if(!/^[a-z0-9]{8,24}$/.test(v||"")){v=Array.from(crypto.getRandomValues(new Uint8Array(8)),b=>(b%36).toString(36)).join("")+Date.now().toString(36).slice(-6);localStorage.setItem("kilowa.vid",v)}return v}catch(e){return null}}
+function track(evento,auto){try{if(/localhost|127\.0\.0\.1/.test(location.hostname))return;try{if(localStorage.getItem("kilowa.equipo"))return}catch(e){}sbInsert("visitas",{evento,vid:kvid(),auto:auto?String(auto).slice(0,120):null,pagina:(location.pathname+((r=>r?"?ref="+r.replace(/[^a-z0-9_-]/gi,"").slice(0,20):"")(new URLSearchParams(location.search).get("ref")))).slice(0,60)})}catch(e){}}
 // Compartir: usa el menú del teléfono si existe; si no, abre WhatsApp
 const SHARE_URL="https://kilowauy.com";
 function shareWA(t){track("compartir");const txt=t+(SHARE_URL?"\n"+SHARE_URL:"");if(navigator.share){navigator.share({text:txt}).catch(()=>{});return}window.open("https://wa.me/?text="+encodeURIComponent(txt),"_blank","noopener")}
